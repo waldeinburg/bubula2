@@ -1,0 +1,50 @@
+.ir-comics-first-small {
+	background-image: url('/static/comics/img/first-small.png');
+	width: 19px;
+	height: 18px;
+}
+.ir-comics-prev-small {
+	background-image: url('/static/comics/img/prev-small.png');
+	width: 14px;
+	height: 16px;
+}
+/*.ir-comics-random-small {
+	background-image: url('/static/comics/img/random-small.png');
+	width: 10px;
+	height: 18px;
+}*/
+.ir-comics-next-small {
+	background-image: url('/static/comics/img/next-small.png');
+	width: 13px;
+	height: 17px;
+}
+.ir-comics-latest-small {
+	background-image: url('/static/comics/img/latest-small.png');
+	width: 19px;
+	height: 16px;
+}
+.ir-comics-first-big {
+	background-image: url('/static/comics/img/first-big.png');
+	width: 38px;
+	height: 36px;
+}
+.ir-comics-prev-big {
+	background-image: url('/static/comics/img/prev-big.png');
+	width: 29px;
+	height: 32px;
+}
+.ir-comics-random-big {
+	background-image: url('/static/comics/img/random-big.png');
+	width: 19px;
+	height: 36px;
+}
+.ir-comics-next-big {
+	background-image: url('/static/comics/img/next-big.png');
+	width: 27px;
+	height: 33px;
+}
+.ir-comics-latest-big {
+	background-image: url('/static/comics/img/latest-big.png');
+	width: 38px;
+	height: 32px;
+}

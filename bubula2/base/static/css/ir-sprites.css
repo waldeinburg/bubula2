@@ -1,0 +1,30 @@
+.ir-base-rss {
+	background-image: url('/static/img/icons.png');
+	background-position: -10px -10px;
+	width: 36px;
+	height: 16px;
+}
+.ir-base-atom {
+	background-image: url('/static/img/icons.png');
+	background-position: -10px -46px;
+	width: 44px;
+	height: 16px;
+}
+.ir-base-flag-da {
+	background-image: url('/static/img/icons.png');
+	background-position: -10px -82px;
+	width: 22px;
+	height: 15px;
+}
+.ir-base-flag-en {
+	background-image: url('/static/img/icons.png');
+	background-position: -10px -117px;
+	width: 25px;
+	height: 15px;
+}
+.ir-base-twitter {
+	background-image: url('/static/img/icons.png');
+	background-position: -10px -152px;
+	width: 16px;
+	height: 16px;
+}

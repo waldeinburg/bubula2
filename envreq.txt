@@ -1,0 +1,14 @@
+Django==1.4.2
+PIL==1.1.7
+South==0.7.6
+django-classy-tags==0.3.4.1
+django-cms==2.3.4
+django-dajaxice==0.5.2
+django-filer==0.9.1
+django-hvad==0.2
+django-mptt==0.5.4
+django-polymorphic==0.2
+django-sekizai==0.6.1
+easy-thumbnails==1.1
+html5lib==0.95
+wsgiref==0.1.2

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% load cms_tags %}
+{% block base_content %}
+	<table>
+		{% for comic in comic_list %}
+			<tr>
+				<td>{{ comic.dateTime|date:"d-m-Y" }}</td>
+				<td>
+					<a href="{% page_url "comics" %}{{ comic.id }}/">{{ comic.title }}</a>
+				</td>
+			</tr>
+		{% endfor %}
+	</table>
+{% endblock %}

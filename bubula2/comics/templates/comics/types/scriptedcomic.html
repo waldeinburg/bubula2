@@ -1,0 +1,11 @@
+{% load sekizai_tags %}
+{% addtoblock "js" %}
+	<script>
+		var scriptedComicImgPaths = [
+			{% for img in comic.get_comic_obj.images.all %}
+				'{{ img.image }}'{% if not forloop.last %},{% endif %}
+			{% endfor %}
+		];
+	</script>
+{% endaddtoblock %}
+{% addtoblock "js" %}<script src="{{ STATIC_URL }}comics/js/scriptedcomic.js"></script>{% endaddtoblock %}

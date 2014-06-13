@@ -1,0 +1,24 @@
+{% load cms_tags sekizai_tags i18n contentblock_tags %}
+{% addtoblock "js" %}<script src="{{ STATIC_URL }}comics/js/paypal.js"></script>{% endaddtoblock %}
+{% addtoblock "css" %}<link href="{{ STATIC_URL }}comics/css/paypal.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+<div id="paypal">
+	<h3>{% trans "support"|capfirst %} 𝔅𝔲𝔟𝔲𝔩𝔞²</h3>
+	<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
+		<input type="hidden" name="cmd" value="_xclick"/>
+		<input type="hidden" name="business" value="6RRC23KFKL2KN"/>
+		<input type="hidden" name="lc" value="DK"/>
+		<input type="hidden" name="item_name" value="{% trans 'comic'|capfirst %} {{ comic.id }}, {% if current_language == 'da' %}dansk{% else %}English{% endif %}{# not {{ current_language|language_name_local }} due to translation error in Django #} ({{ comic.title }})"/>
+		<input type="hidden" name="item_number" value="comic_{{ comic.id }}_{{ current_language }}"/>
+		<span id="paypal-amountCnt">{% if current_language == 'da' %}kr.{% else %}€{% endif %} <input type="text" name="amount" value="0"/></span>
+		<input type="hidden" name="currency_code" value="{% if current_language == 'da' %}DKK{% else %}EUR{% endif %}"/>
+		<input type="hidden" name="button_subtype" value="services"/>
+		<input type="hidden" name="no_note" value="0"/>
+		<input type="hidden" name="cn" value="{% trans 'Add special instructions to the seller' %}:"/>
+		<input type="hidden" name="no_shipping" value="2"/>
+		<input type="hidden" name="rm" value="1"/>
+		<input type="hidden" name="return" value="{{ baseUrl }}{% page_url 'thanks' %}"/>
+		<input type="hidden" name="bn" value="PP-BuyNowBF:btn_buynow_SM.gif:NonHosted"/>
+		<input type="image" src="https://www.paypalobjects.com/{% if current_language == 'da' %}da_DK{% else %}en_US{% endif %}/i/btn/btn_buynow_SM.gif" name="submit" alt="{% trans 'PayPal - The safer, easier way to pay online!' %}"/>
+	</form>
+	<p>Support info</p>
+</div>

@@ -1,0 +1,5 @@
+{% load cms_tags %}
+{% if showComicTitle %}<h3 id="comic_title">{{ comic.title }}</h3>{% endif %}
+<div class="comic_plugin_cnt">
+	<a href="{% page_url "comics" %}{{ comic.id }}/"><img src="{{ MEDIA_URL }}{{ comic.get_comic_obj.image }}" alt="{{ comic.get_comic_obj.title }}" title="{{ comic.get_comic_obj.mouseoverText }}" /></a>
+</div>

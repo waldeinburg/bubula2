@@ -1,0 +1,184 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-11-17 23:25+0100\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#: base/templates/base/404.html:16 base/templates/base/404.html.py:29
+#: templates/404.html:16 templates/404.html.py:29
+msgid "Not Found"
+msgstr "Ikke Fundet"
+
+#: base/templates/base/404.html:24 base/templates/base/base.html:64
+#: templates/404.html:24 templates/base.html:64
+msgid "by"
+msgstr "af"
+
+#: base/templates/base/404.html:31 templates/404.html:31
+msgid "Self-portrait"
+msgstr "Selv-portræt"
+
+#: base/templates/base/base.html:80 templates/base.html:80
+msgid "Next comic today"
+msgstr "Næste stribe i dag"
+
+#: base/templates/base/base.html:82 templates/base.html:82
+msgid "Next comic tomorrow"
+msgstr "Næste stribe i morgen"
+
+#: base/templates/base/base.html:84 templates/base.html:84
+msgid "Next comic on"
+msgstr "Næste stribe på"
+
+#: base/templates/base/base.html:87 templates/base.html:87
+msgid "Updating once in a while"
+msgstr "Opdaterer en gang imellem"
+
+#: base/templates/base/base.html:91 base/templates/base/base.html.py:92
+#: base/templates/base/base.html:93 templates/base.html:91
+#: templates/base.html.py:92 templates/base.html:93
+msgid "subscribe"
+msgstr "abonner"
+
+#: base/templates/base/base.html:121 templates/base.html:121
+msgid "updated"
+msgstr "opdateret"
+
+#: base/templates/base/base.html:124 templates/base.html:124
+msgid "contact"
+msgstr "kontakt"
+
+#: base/templates/base/admin/editpagesubtitle.html:63
+#, python-format
+msgid "Add another %(verbose_name)s"
+msgstr ""
+
+#: base/templates/base/admin/editpagesubtitle.html:66
+msgid "Remove"
+msgstr ""
+
+#: comics/feeds.py:8
+msgid "Bubula² latest comics"
+msgstr "Bubula² seneste striber"
+
+#: comics/feeds.py:10
+msgid "Latest comic of the Bubula² webcomic."
+msgstr "Seneste striber i web-tegneserien Bubula²."
+
+#: comics/models.py:37
+msgid "comics"
+msgstr "striber"
+
+#: comics/templates/comics/shared/paypal.html:5
+msgid "support"
+msgstr "støt"
+
+#: comics/templates/comics/shared/paypal.html:10
+#: comics/templates/comics/shared/single.html:24
+#: comics/templates/comics/shared/single.html:25
+#: comics/templates/comics/shared/single.html:30
+#: comics/templates/comics/shared/single.html:32
+#: comics/templates/comics/shared/single.html:33
+#: comics/templates/comics/shared/single.html:46
+#: comics/templates/comics/shared/single.html:47
+#: comics/templates/comics/shared/single.html:52
+#: comics/templates/comics/shared/single.html:54
+#: comics/templates/comics/shared/single.html:55
+msgid "comic"
+msgstr "stribe"
+
+#: comics/templates/comics/shared/paypal.html:16
+msgid "Add special instructions to the seller"
+msgstr "Tilføj særlige instruktioner til sælgeren"
+
+#: comics/templates/comics/shared/paypal.html:21
+msgid "PayPal - The safer, easier way to pay online!"
+msgstr "PayPal - Den sikre og nemme måde til online betaling."
+
+#: comics/templates/comics/shared/single.html:24
+#: comics/templates/comics/shared/single.html:46
+msgid "first"
+msgstr "første"
+
+#: comics/templates/comics/shared/single.html:25
+#: comics/templates/comics/shared/single.html:47
+msgid "previous"
+msgstr "forrige"
+
+#: comics/templates/comics/shared/single.html:30
+msgid "select"
+msgstr "vælg"
+
+#: comics/templates/comics/shared/single.html:32
+#: comics/templates/comics/shared/single.html:54
+msgid "next"
+msgstr "næste"
+
+#: comics/templates/comics/shared/single.html:33
+#: comics/templates/comics/shared/single.html:55
+msgid "latest"
+msgstr "seneste"
+
+#: comics/templates/comics/shared/single.html:52
+msgid "random"
+msgstr "tilfældig"
+
+# Overridden
+msgid "Danish"
+msgstr "dansk"
+
+msgid "Monday"
+msgstr "mandag"
+
+msgid "Tuesday"
+msgstr "tirsdag"
+
+msgid "Wednesday"
+msgstr "onsdag"
+
+msgid "Thursday"
+msgstr "torsdag"
+
+msgid "Friday"
+msgstr "fredag"
+
+msgid "Saturday"
+msgstr "lørdag"
+
+msgid "Sunday"
+msgstr "søndag"
+
+msgid "Mon"
+msgstr "man"
+
+msgid "Tue"
+msgstr "tir"
+
+msgid "Wed"
+msgstr "ons"
+
+msgid "Thu"
+msgstr "tor"
+
+msgid "Fri"
+msgstr "fre"
+
+msgid "Sat"
+msgstr "lør"
+
+msgid "Sun"
+msgstr "søn"

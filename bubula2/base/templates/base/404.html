@@ -1,0 +1,35 @@
+{% spaceless %}<!DOCTYPE html>
+{% load sekizai_tags contentblock_tags i18n %}
+{% if DEBUG %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}css/normalize.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}css/main.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}css/ir-sprites.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+{% else %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}css/pack.min.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+{% endif %}
+{% endspaceless %}
+<html>
+	<head>
+		<meta charset="UTF-8"/>
+		<meta name="author" content="Daniel Lundsgaard Skovenborg"/>
+		<link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico"/>
+		<title>Bubula² : 404 ({% trans "Not Found" %})</title>
+		{% render_block "css" %}
+	</head>
+	<body>
+		<div id="upper">
+			<div id="titleCnt">
+				<div id="titleAndAuthor">
+					<h1 title="{% contentblock 'titleTranslation' %}"><a href="/"><img src="{{ STATIC_URL }}img/title.png" alt="𝔅𝔲𝔟𝔲𝔩𝔞²"/></a></h1>
+					<div id="author">{% trans 'by'|capfirst %} <span title="Daniel Lundsgaard Skovenborg">Waldeinburg</span></div>
+				</div>
+			</div>
+		</div>
+		<div id="content">
+			<h2>404 ({% trans "Not Found" %})</h2>
+			<div id="image">
+				<a href="#image"><img src="{{ STATIC_URL }}img/404.png" alt="404 (Not Found)" title="{% trans 'Self-portrait' %}"/></a>
+			</div>
+		</div>
+	</body>
+</html>

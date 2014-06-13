@@ -1,0 +1,13 @@
+#paypal {
+	text-align: center;
+	margin: 2em 0 0;
+}
+#paypal input[type='image'] {
+	border: none;
+}
+#paypal input[name='amount'] {
+	width: 4em;
+}
+#paypal-amountCnt, #paypal input[name='submit'] {
+	vertical-align: middle;
+}

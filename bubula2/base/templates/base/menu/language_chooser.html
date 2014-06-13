@@ -1,0 +1,4 @@
+{% load language_chooser_tags %}
+{% for language in languages %}
+<li><a href="{% page_with_app_language_url language.0 %}" title="{{ language.1|capfirst }}" class="{% ifequal current_language language.0 %}current {% endifequal %} ir ir-base-flag-{{ language.0 }}">{{ language.1|capfirst }}</a></li>
+{% endfor %}

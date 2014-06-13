@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+{% load cms_tags sekizai_tags i18n menu_tags contentblock_tags mailto_tags comics_tags %}
+{% addtoblock "js" %}
+	<script>
+		var
+			global = this,
+		{% get_current_language as LANG %}
+			lang = '{{ LANG }}',
+			comicsUrl = '{% page_url "comics" %}';
+	</script>
+{% endaddtoblock %}
+{% if DEBUG %}
+	{% addtoblock "js" %}<script src="{{ STATIC_URL }}js/vendor/jquery-1.8.2.js"></script>{% endaddtoblock %}
+	{% addtoblock "js" %}<script src="{{ STATIC_URL }}js/plugins.js"></script>{% endaddtoblock %}
+	{% addtoblock "js" %}<script src="{{ STATIC_URL }}js/main.js"></script>{% endaddtoblock %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}css/normalize.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}css/main.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}css/ir-sprites.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+{% else %}
+	{% addtoblock "js" %}<script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>{% endaddtoblock %}
+	{% addtoblock "js" %}<script>window.jQuery || document.write('<script src="js/vendor/jquery-1.8.2.min.js"><\/script>')</script>{% endaddtoblock %}
+	{% addtoblock "js" %}<script src="{{ STATIC_URL }}js/pack.min.js"></script>{% endaddtoblock %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}css/pack.min.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+{% endif %}
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Bubula² :
+			{% if title %}
+				{{ title }}
+			{% else %}
+				{% page_attribute page_title %}
+			{% endif %}
+		</title>
+		<meta name="author" content="Daniel Lundsgaard Skovenborg"/>
+		<meta name="description" content="{% contentblock 'description' %}"/>
+		<meta name="keywords" content="{% contentblock 'keywords' %}"/>
+		<link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico"/>
+		<meta name="viewport" content="width=device-width">
+		{% render_block "css" %}
+		{% if not DEBUG %}
+			<script>
+				var _gaq=[['_setAccount','UA-35577761-1'],['_trackPageview']];
+				(function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+				g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+				s.parentNode.insertBefore(g,s)}(document,'script'));
+			</script>
+ 		{% endif %}
+ 		{% comment %}Not needed<script src="{{ STATIC_URL }}js/vendor/modernizr-2.6.2.min.js"></script>{# Modernizr must be loaded before body #}{% endcomment %}
+	</head>
+	<body>
+		<!--[if lt IE 7]>
+			<p class="chromeframe">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.</p>
+		<![endif]-->
+		{% render_block "preMain" %}
+		<div id="upper">
+			<div id="mainMenuCnt">
+				<nav id="mainMenu"><ul class="menu">{% show_menu %}</ul></nav>
+			</div>
+			<div id="titleCnt">
+				<div id="titleAndAuthor">
+					<h1 title="{% contentblock 'titleTranslation' %}"><a href="/"><img src="{{ STATIC_URL }}img/title.png" alt="𝔅𝔲𝔟𝔲𝔩𝔞²"/></a></h1>
+					<div id="author">{% trans 'by'|capfirst %} <span title="Daniel Lundsgaard Skovenborg">Waldeinburg</span></div>
+				</div>			
+				<div id="subtitle">–
+					{% if subtitle %}
+						{{ subtitle }}
+					{% else %}
+						{{ page_extra.subtitle }}
+					{% endif %}
+				</div>
+			</div>
+			<div id="miscMenuCnt">
+				<div id="getNews">
+					<div id="nextUpdate">
+						{% coming_comic_date as comingComicDate %}
+						{% if comingComicDate %}
+							{% if comingComicDate == 1 %}
+								{% trans "Next comic today" %}!
+							{% elif comingComicDate == 2 %}
+								{% trans "Next comic tomorrow" %}!
+							{% else %}
+								{% trans "Next comic on" %} {{ comingComicDate|date:"l" }}!
+							{% endif %}
+						{% else %}
+							{% trans "Updating once in a while" %}.
+						{% endif %}
+					</div>
+					<ul id="feeds" class="menu">
+						<li>{% trans 'subscribe'|capfirst %}:</li>
+						<li><a href="{% page_url "comics" %}feed/latest/rss/" title="{% trans 'subscribe'|capfirst %} (RSS)" class="ir ir-base-rss">{% trans 'subscribe'|capfirst %} (RSS)</a></li>
+						<li><a href="{% page_url "comics" %}feed/latest/atom/" title="{% trans 'subscribe'|capfirst %} (Atom)" class="ir ir-base-atom">{% trans 'subscribe'|capfirst %} (Atom)</a></li>
+					</ul>
+					<div id="twitter">
+						<a href="https://twitter.com/waldeinburg">
+							<span class="ir ir-base-twitter">Twitter</span>
+							@Waldeinburg
+						</a>
+					</div>
+				</div>
+				<ul id="langMenu" class="menu">{% language_chooser "base/menu/language_chooser.html" "native" %}</ul>
+			</div>
+		</div>
+		<div id="content">
+			<h2>
+				{% if title %}
+					{{ title }}
+				{% else %}
+					{% page_attribute page_title %}
+				{% endif %}
+			</h2>
+			{% block base_content %}{% endblock %}
+		</div>
+		<div id="footer">
+			<div id="copyright">
+				{% contentblock "copyright" %}
+			</div>
+			<div id="tech">
+				<p>Powered by <a href="https://www.django-cms.org">Django CMS</a>!</p>
+				<p id="downloadSource"><a href="{{ MEDIA_URL }}src/bubula2-{{ RELEASE }}.tgz">Download source!</a> ({% trans "updated" %} {{ RELEASE_TIME|date:"d-m-Y H:i:s" }})</p>
+			</div>
+			<div id="contact">
+				{% trans "contact"|capfirst %}: {% mailto waldeinburg@bubula2.com %}
+			</div>
+		</div>
+		{% render_block "js" %}
+	</body>
+</html>

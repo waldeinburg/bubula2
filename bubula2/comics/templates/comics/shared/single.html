@@ -1,0 +1,63 @@
+{% load cms_tags sekizai_tags i18n dajaxice_templatetags %}
+{% addtoblock "js" %}{% dajaxice_js_import %}{% endaddtoblock %}
+{% addtoblock "js" %}
+	<script>
+		comicId = {{ comic.id }};
+		comicUrl = '{{ baseUrl }}/{{ current_language }}{% page_url "comics" %}{{ comic.id }}/';
+		comicTitle = '{{ comic.title|escapejs }}';
+	</script>
+{% endaddtoblock %}
+{% if DEBUG %}
+	{% addtoblock "js" %}<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.js"></script>{% endaddtoblock %}
+	{% addtoblock "js" %}<script src="{{ STATIC_URL }}comics/js/dropdown.js"></script>{% endaddtoblock %}
+	{% addtoblock "js" %}<script src="{{ STATIC_URL }}comics/js/single.js"></script>{% endaddtoblock %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}comics/css/dropdown.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}comics/css/single.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}comics/css/single-ir-sprites.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+{% else %}
+	{% addtoblock "js" %}<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js"></script>{% endaddtoblock %}
+	{% addtoblock "js" %}<script src="{{ STATIC_URL }}comics/js/single-pack.min.js"></script>{% endaddtoblock %}
+	{% addtoblock "css" %}<link href="{{ STATIC_URL }}comics/css/single-pack.min.css" rel="stylesheet" media="all"/>{% endaddtoblock %}
+{% endif %}
+<ul id="comic-dateMenu" class="menu small">
+	{% if firstId %}
+		<li><a href="{% page_url 'comics' %}{{ firstId }}/" title="{% trans 'first'|capfirst %} {% trans 'comic' %}" class="ir ir-comics-first-small">{% trans 'first'|capfirst %} {% trans 'comic' %}</a></li>
+		<li><a href="{% page_url 'comics' %}{{ prevId }}/" title="{% trans 'previous'|capfirst %} {% trans 'comic' %}" class="ir ir-comics-prev-small">{% trans 'previous'|capfirst %} {% trans 'comic' %}</a></li>
+	{% else %}
+		<li><span class="ir ir-comics-first-small disabledLink"></span></li>
+		<li><span class="ir ir-comics-prev-small disabledLink"></span></li>
+	{% endif %}
+	<li id="comic-date"><a href="#" onclick="jQuery(this).blur(); return false;" title="{% trans 'select'|capfirst %} {% trans 'comic' %}">{{ comic.dateTime|date:"j-n-Y" }}</a></li>
+	{% if latestId %}
+		<li><a href="{% page_url 'comics' %}{{ nextId }}/" title="{% trans 'next'|capfirst %} {% trans 'comic' %}" class="ir ir-comics-next-small">{% trans 'next'|capfirst %} {% trans 'comic' %}</a></li>
+		<li><a href="{% page_url 'comics' %}{{ latestId }}/" title="{% trans 'latest'|capfirst %} {% trans 'comic' %}" class="ir ir-comics-latest-small">{% trans 'latest'|capfirst %} {% trans 'comic' %}</a></li>
+	{% else %}
+		<li><span class="ir ir-comics-next-small disabledLink"></span></li>
+		<li><span class="ir ir-comics-latest-small disabledLink"></span></li>
+	{% endif %}
+</ul>
+<div id="comic">
+	<a href="#comic">{% include comicTemplate %}</a>
+</div>
+<div id="permalink" class="small">Permalink: <a href="{{ baseUrl }}/{{ comic.id }}/">{{ baseUrl }}/{{ comic.id }}/</a></div>
+<nav>
+	<ul id="comic-navMenu" class="menu">
+		{% if firstId %}
+			<li><a href="{% page_url 'comics' %}{{ firstId }}/" title="{% trans 'first'|capfirst %} {% trans 'comic' %}" class="ir ir-comics-first-big">{% trans 'first'|capfirst %} {% trans 'comic' %}</a></li>
+			<li><a href="{% page_url 'comics' %}{{ prevId }}/" title="{% trans 'previous'|capfirst %} {% trans 'comic' %}" class="ir ir-comics-prev-big">{% trans 'previous'|capfirst %} {% trans 'comic' %}</a></li>
+		{% else %}
+			<li><span class="ir ir-comics-first-big disabledLink"></span></li>
+			<li><span class="ir ir-comics-prev-big disabledLink"></span></li>
+		{% endif %}
+		<li><a href="{% page_url 'comics' %}random/" title="{% trans 'random'|capfirst %} {% trans 'comic' %}" class="ir ir-comics-random-big">{% trans 'random'|capfirst %} {% trans 'comic' %}</a></li>
+		{% if latestId %}
+			<li><a href="{% page_url 'comics' %}{{ nextId }}/" title="{% trans 'next'|capfirst %} {% trans 'comic' %}" class="ir ir-comics-next-big">{% trans 'next'|capfirst %} {% trans 'comic' %}</a></li>
+			<li><a href="{% page_url 'comics' %}{{ latestId }}/" title="{% trans 'latest'|capfirst %} {% trans 'comic' %}" class="ir ir-comics-latest-big">{% trans 'latest'|capfirst %} {% trans 'comic' %}</a></li>
+		{% else %}
+			<li><span class="ir ir-comics-next-big disabledLink"></span></li>
+			<li><span class="ir ir-comics-latest-big disabledLink"></span></li>
+		{% endif %}
+	</ul>
+</nav>
+<div id="ohnorobot"></div>
+{% if DEBUG %}{% include "comics/shared/paypal.html" %}{% endif %}

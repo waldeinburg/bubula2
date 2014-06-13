@@ -1,0 +1,25 @@
+.ir-base-rss {
+	background-image: url('/static/img/rss.png');
+	width: 36px;
+	height: 16px;
+}
+.ir-base-atom {
+	background-image: url('/static/img/atom.png');
+	width: 44px;
+	height: 16px;
+}
+.ir-base-flag-da {
+	background-image: url('/static/img/flag-da.png');
+	width: 22px;
+	height: 15px;
+}
+.ir-base-flag-en {
+	background-image: url('/static/img/flag-en.png');
+	width: 25px;
+	height: 15px;
+}
+.ir-base-twitter {
+	background-image: url('/static/img/twitter.png');
+	width: 16px;
+	height: 16px;
+}
