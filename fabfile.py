@@ -6,6 +6,7 @@ import time
 env.colors = True
 env.format = True
 env.config_file = 'fabconfig.yaml'
+env.config_fileTpl = 'fabconfig-tpl.yaml'
 env.releaseTS = int(round( time.time() ))
 env.release = datetime.fromtimestamp(env.releaseTS).strftime('%y%m%d%H%M%S')
 env.optimizeImages = False
@@ -82,7 +83,6 @@ def buildstatic():
 def deploy():
     print yellow('>>> generating dummy config-file for the public')
     # hack
-    local(r'sed -r "s/ [a-z0-9]+.webfaction.com/ my_server/; s/(( +)(user|appsPath|password))\:.*/\1: my_\3/" {config_file} > fabconfig-dummy.yaml')
     print yellow('>>> updating release ID and timestamp')
     local( 'sed -ri "'+r"s/^(release = )'(.*?)'$/\1'{release}'/; s/^(releaseTS = )([0-9]+)$/\1{releaseTS}/"+'" {project}/__init__.py'.format(project=env.config.default['project'], **env) )
     print yellow('>>> creating source tarball')
@@ -140,3 +140,11 @@ def _remote_collect_static():
     with cd( env.path.format(**env) ):
         res = run('. {pyenv}/bin/activate; echo yes | python {project}/manage.py collectstatic')
         print res.stdout
+
+@task
+def rebuildconf():
+    # The first time, first run $ touch fabconfig.yaml
+    # The file private contains lines of the form
+    # VARIABLE=value
+    print yellow('>>> rebuilding {config_file}'.format(**env))
+    local(r'cat {config_fileTpl} | sed "$(cat private | sed -r "s/\//\\\\\\//g; s/([A-Z_]+)=(.*)/s\/%\1%\/\2\//")" > {config_file}'.format(**env))

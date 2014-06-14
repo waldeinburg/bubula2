@@ -20,13 +20,12 @@ default:
 
 app-servers:
   hosts:
-    - my_server
+    - %HOST%
   
 hostinfo:
-  my_server:
-    user: my_user
-    password: my_password
-    appsPath: my_appsPath
+  webfaction:
+    user: %HOST_USER%
+    appsPath: %HOST_APPS_PATH%
     static: '{appsPath}/bubula2_static'
     media: '{appsPath}/bubula2_media'
     path: '{appsPath}/bubula2'
