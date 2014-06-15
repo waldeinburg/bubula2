@@ -6,7 +6,7 @@ import time
 env.colors = True
 env.format = True
 env.config_file = 'fabconfig.yaml'
-env.config_fileTpl = 'fabconfig-tpl.yaml'
+env.config_fileTpl = 'fabconfig.tpl.yaml'
 env.releaseTS = int(round( time.time() ))
 env.release = datetime.fromtimestamp(env.releaseTS).strftime('%y%m%d%H%M%S')
 env.optimizeImages = False
