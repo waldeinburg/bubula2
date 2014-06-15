@@ -7,6 +7,9 @@ env.colors = True
 env.format = True
 env.config_file = 'fabconfig.yaml'
 env.config_fileTpl = 'fabconfig.tpl.yaml'
+env.privateDataFile = 'private'
+env.settingsTpl = 'settings.tpl.py'
+env.settingsDir = 'settings'
 env.releaseTS = int(round( time.time() ))
 env.release = datetime.fromtimestamp(env.releaseTS).strftime('%y%m%d%H%M%S')
 env.optimizeImages = False
@@ -141,10 +144,20 @@ def _remote_collect_static():
         res = run('. {pyenv}/bin/activate; echo yes | python {project}/manage.py collectstatic')
         print res.stdout
 
+@task('app-servers')
+def buildsettings():
+    env().multirun(_build_settings)
+
+
+def _build_settings():
+    print yellow('>>> building settings file')
+    local('./simple-proc-tpl.sh {settingsTpl} {privateDataFile} {settingsDir}/settings-{host_string}.py'.format(**env))
+
+
 @task
 def rebuildconf():
     # The first time, first run $ touch fabconfig.yaml
     # The file private contains lines of the form
     # VARIABLE=value
     print yellow('>>> rebuilding {config_file}'.format(**env))
-    local(r'cat {config_fileTpl} | sed "$(cat private | sed -r "s/\//\\\\\\//g; s/([A-Z_]+)=(.*)/s\/%\1%\/\2\//")" > {config_file}'.format(**env))
+    local('./simple-proc-tpl.sh {config_fileTpl} {privateDataFile} {config_file}'.format(**env))
