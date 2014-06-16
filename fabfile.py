@@ -1,7 +1,9 @@
-from fabric.api import env, task, local, run, cd, abort
-from fabric.colors import yellow, red
+from os import chdir
 from datetime import datetime
 import time
+from fabric.api import env, task, local, run, cd, abort
+from fabric.colors import yellow, red
+from django.core import management
 
 env.colors = True
 env.format = True
@@ -143,6 +145,19 @@ def _remote_collect_static():
     with cd( env.path.format(**env) ):
         res = run('. {pyenv}/bin/activate; echo yes | python {project}/manage.py collectstatic')
         print res.stdout
+
+
+@task
+def buildtranslation():
+    # http://blog.brendel.com/2010/09/how-to-customize-djangos-default.html
+    chdir(env.config.default['project'])
+    print yellow('>>> translating all messages')
+    management.call_command('makemessages', all=True)
+    print yellow('>>> Removing commented-out manual messages')
+    local(r"find locale -name 'django.po' -exec sed s/^\#\~\ // -i {{}} \;")
+    print yellow('>>> Compiling messages')
+    management.call_command('compilemessages')
+
 
 @task('app-servers')
 def buildsettings():
