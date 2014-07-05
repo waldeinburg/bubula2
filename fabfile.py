@@ -16,7 +16,7 @@ env.config_file_tpl = 'fabconfig.tpl.yaml'
 env.private_data_file = 'private'
 env.settings_tpl = 'settings.tpl.py'
 env.settings_dir = 'settings'
-env.releaseTS = int(round( time.time() ))
+env.releaseTS = int(round(time.time()))
 env.release = datetime.fromtimestamp(env.releaseTS).strftime('%y%m%d%H%M%S')
 
 def _build_fab_conf():
@@ -68,12 +68,12 @@ def build_static():
         with open(bundle_path, 'w') as outfile:
             for libpath in env.config.bundle_and_minify[bundle_path]:
                 with open(libpath, 'r') as libfile:
-                    outfile.write( libfile.read() )
+                    outfile.write(libfile.read())
         # this replaces the large code block below for our purposes
-        outpathComponents = get_file_base_and_extension(bundle_path)
-        minifiedPath = '{0}.min{1}'.format(outpathComponents[0], outpathComponents[1])
-        local('java -jar {yuicompressor} -v -o "{outFile}" --charset utf-8 "{inFile}"'.format(
-                yuicompressor=env.config.paths.yuicompressor_path, outFile=minifiedPath, inFile=bundle_path),
+        outpath_components = get_file_base_and_extension(bundle_path)
+        minified_path = '{0}.min{1}'.format(outpath_components[0], outpath_components[1])
+        local('java -jar {yuicompressor} -v -o "{out_file}" --charset utf-8 "{in_file}"'.format(
+                yuicompressor=env.config.paths.yuicompressor_path, out_file=minified_path, in_file=bundle_path),
               capture=False)
 
 
@@ -82,27 +82,27 @@ def deploy():
     print yellow('>>> generating dummy config-file for the public')
     # hack
     print yellow('>>> updating release ID and timestamp')
-    local( 'sed -ri "'+r"s/^(release = )'(.*?)'$/\1'{release}'/; s/^(releaseTS = )([0-9]+)$/\1{releaseTS}/"+'" {project}/__init__.py'.format(project=env.config.default['project'], **env) )
+    local('sed -ri "'+r"s/^(release = )'(.*?)'$/\1'{release}'/; s/^(releaseTS = )([0-9]+)$/\1{releaseTS}/"+'" {project}/__init__.py'.format(project=env.config.default['project'], **env))
     print yellow('>>> creating source tarball')
-    srcFile = '{project}-{release}.tgz'.format(project=env.config.default['project'], **env)
-    env.srcFile = srcFile
-    res = local( 'cd ..; tar -czf {srcFile} --exclude="*.pyc" --exclude="{project}/env" --exclude="{project}/static/*" --exclude="{project}/media/*" --exclude="{project}/settings" --exclude="{project}/{config_file}" --exclude="migrations" {project}'.format(project=env.config.default['project'], **env) )
+    src_file = '{project}-{release}.tgz'.format(project=env.config.default['project'], **env)
+    env.src_file = src_file
+    res = local('cd ..; tar -czf {src_file} --exclude="*.pyc" --exclude="{project}/env" --exclude="{project}/static/*" --exclude="{project}/media/*" --exclude="{project}/settings" --exclude="{project}/{config_file}" --exclude="migrations" {project}'.format(project=env.config.default['project'], **env))
     if res.failed:
         abort(res.stderr)
     env().multirun(_deploy)
     print yellow('>>> deleting source tarball locally')
-    local ( 'rm ../{0}'.format(srcFile) )
+    local('rm ../{0}'.format(src_file))
 
 
 def _deploy():
     print yellow('>>> uploading source tarball')
-    local( 'scp ../{srcFile} {user}@{host_string}:{media}/src/'.format(**env) )
+    local('scp ../{src_file} {user}@{host_string}:{media}/src/'.format(**env))
     print yellow('>>> syncing source')
-    local( 'rsync -avuz --delete --exclude="*.pyc" --exclude="/settings.py" --exclude="migrations/" {project}/ {user}@{host_string}:{path}/{project}/{project}/'.format(**env), capture=False )
+    local('rsync -avuz --delete --exclude="*.pyc" --exclude="/settings.py" --exclude="migrations/" {project}/ {user}@{host_string}:{path}/{project}/{project}/'.format(**env), capture=False)
     print yellow('>>> syncing remote settings')
-    local( 'rsync -avuz settings/settings-{host_string}.py {user}@{host_string}:{path}/{project}/{project}/settings.py'.format(**env) )
+    local('rsync -avuz settings/settings-{host_string}.py {user}@{host_string}:{path}/{project}/{project}/settings.py'.format(**env))
     print yellow('>>> syncing static')
-    local( 'rsync -avuz --delete {static_relative_dir}/ {user}@{host_string}:{static}/'.format(**env), capture=False )
+    local('rsync -avuz --delete {static_relative_dir}/ {user}@{host_string}:{static}/'.format(**env), capture=False)
 
 
 @task#('app-servers')
@@ -112,7 +112,7 @@ def restart():
 
 def _restart():
     print yellow('>>> restarting server')
-    res = run( env.restart.format(**env) )
+    res = run(env.restart.format(**env))
     print res.stderr
 
 
@@ -135,7 +135,7 @@ def remote_collect_static():
 
 def _remote_collect_static():
     print yellow('>>> collecting static')
-    with cd( env.path.format(**env) ):
+    with cd(env.path.format(**env)):
         res = run('. {pyenv}/bin/activate; echo yes | python {project}/manage.py collectstatic')
         print res.stdout
 
