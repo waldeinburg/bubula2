@@ -18,8 +18,6 @@ env.settings_tpl = 'settings.tpl.py'
 env.settings_dir = 'settings'
 env.releaseTS = int(round( time.time() ))
 env.release = datetime.fromtimestamp(env.releaseTS).strftime('%y%m%d%H%M%S')
-env.optimizeImages = False
-env.yuicompressorPath = '/usr/local/bin/yuicompressor-2.4.7.jar'
 
 def _build_fab_conf():
     local('./simple-proc-tpl.sh {config_file_tpl} {private_data_file} {config_file}'.format(**env))
@@ -38,13 +36,15 @@ def _setup():
     env.hosts = env.config.hosts
 
     # Process paths, allowing references
+    paths = _AttributeDict(env.config.paths)
     process_again = True
     while process_again:
         process_again = False
-        for p in env.config.paths:
-            env.config.paths[p] = env.config.paths[p].format(**env.config.paths)
-            if env.config.paths[p].find('{') != -1:
+        for p in paths:
+            paths[p] = paths[p].format(**paths)
+            if paths[p].find('{') != -1:
                 process_again = True
+    env.config.paths = paths
 _setup()
 
 
@@ -73,7 +73,7 @@ def build_static():
         outpathComponents = get_file_base_and_extension(bundle_path)
         minifiedPath = '{0}.min{1}'.format(outpathComponents[0], outpathComponents[1])
         local('java -jar {yuicompressor} -v -o "{outFile}" --charset utf-8 "{inFile}"'.format(
-                yuicompressor=env.yuicompressorPath, outFile=minifiedPath, inFile=bundle_path),
+                yuicompressor=env.config.paths.yuicompressor_path, outFile=minifiedPath, inFile=bundle_path),
               capture=False)
 
 
@@ -171,8 +171,8 @@ def rebuild_fab_conf():
 
 
 @task
-def local_recreate_env():
-    print yellow('>>> deleting env')
+def recreate_dev_env():
+    print yellow('>>> deleting development env')
     # delete env (silent fail)
     # local:
-    #   pip install -r envreq.txt --allow-external PIL --allow-unverified PIL
+    #   pip install -r envreq-dev.txt --allow-external PIL --allow-unverified PIL
