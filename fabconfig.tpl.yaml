@@ -1,32 +1,28 @@
-default:
-  project: bubula2
-  pyenv: env
-  staticRelativeDir: static
-  bundle_and_minify:
-    static/js/pack.js:
-      - static/js/plugins.js
-      - static/js/main.js
-    static/css/pack.css:
-      - static/css/normalize.css
-      - static/css/main.css
-      - static/css/ir-sprites.css
-    static/comics/js/single-pack.js:
-      - static/comics/js/dropdown.js
-      - static/comics/js/single.js
-    static/comics/css/single-pack.css:
-      - static/comics/css/dropdown.css
-      - static/comics/css/single.css
-      - static/comics/css/single-ir-sprites.css
+project: bubula2
+pyenv: env
+static_relative_dir: static
+bundle_and_minify:
+  static/js/pack.js:
+    - static/js/plugins.js
+    - static/js/main.js
+  static/css/pack.css:
+    - static/css/normalize.css
+    - static/css/main.css
+    - static/css/ir-sprites.css
+  static/comics/js/single-pack.js:
+    - static/comics/js/dropdown.js
+    - static/comics/js/single.js
+  static/comics/css/single-pack.css:
+    - static/comics/css/dropdown.css
+    - static/comics/css/single.css
+    - static/comics/css/single-ir-sprites.css
 
-app-servers:
-  hosts:
-    - %HOST%
-  
-hostinfo:
-  webfaction:
-    user: %HOST_USER%
-    appsPath: %HOST_APPS_PATH%
-    static: '{appsPath}/bubula2_static'
-    media: '{appsPath}/bubula2_media'
-    path: '{appsPath}/bubula2'
-    restart: '{path}/apache2/bin/restart'
+hosts:
+  - %HOST%
+
+paths:
+  apps_path: %HOST_APPS_PATH%
+  static: '{apps_path}/bubula2_static'
+  media: '{apps_path}/bubula2_media'
+  path: '{apps_path}/bubula2'
+  restart: '{path}/apache2/bin/restart'
