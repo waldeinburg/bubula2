@@ -21,7 +21,7 @@ hosts:
   - %HOST%
 
 paths:
-  yuicompressor_path: '/usr/local/bin/yuicompressor-2.4.7.jar'
+  yuicompressor_path: '/usr/local/share/yuicompressor-2.4.8.jar'
   apps_path: %HOST_APPS_PATH%
   static: '{apps_path}/bubula2_static'
   media: '{apps_path}/bubula2_media'
