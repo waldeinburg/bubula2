@@ -53,8 +53,7 @@ _setup()
 # Removed S3 and gzipping and adopted to coding style
 @task
 def build_static():
-    print yellow('>>> collecting static')
-    local('echo yes | env python manage.py collectstatic', capture=False)
+    recollect_static()
     
     print yellow('>>> building static')
     def get_file_base_and_extension(filename):
@@ -118,14 +117,14 @@ def _restart():
 
 @task
 def recollect_static():
-    with cd(env.config.default['static_relative_dir']):
+    with cd(env.config.static_relative_dir):
         print yellow('>>> removing all files in static')
-        local('rm -r *')
+        local('pwd')
+        return
+        #local('rm -r *')
     print yellow('>>> collecting static')
-    # FIXME: even when using virtualenv, statics are collected from dist-packages.
-    # Find a secure way to sync with server environment
-    print red('>>> warning: remember that things will go wrong if local and server environment is not the same!')
-    local('echo yes | python manage.py collectstatic')
+    #print red('>>> warning: remember that things will go wrong if local and server environment is not the same!')
+    local('echo yes | env python manage.py collectstatic', capture=False)
 
 
 @task#('app-servers')
@@ -153,7 +152,7 @@ def build_translation():
 
 
 @task#('app-servers')
-def buildsettings():
+def build_settings():
     env().multirun(_build_settings)
 
 
@@ -168,11 +167,3 @@ def rebuild_fab_conf():
     # VARIABLE=value
     print yellow('>>> rebuilding {config_file}'.format(**env))
     _build_fab_conf()
-
-
-@task
-def recreate_dev_env():
-    print yellow('>>> deleting development env')
-    # delete env (silent fail)
-    # local:
-    #   pip install -r envreq-dev.txt --allow-external PIL --allow-unverified PIL
