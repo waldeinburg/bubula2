@@ -12,4 +12,5 @@ django-polymorphic==0.2
 django-sekizai==0.6.1
 easy-thumbnails==1.1
 html5lib==0.95
+psycopg2==2.5.3
 wsgiref==0.1.2
