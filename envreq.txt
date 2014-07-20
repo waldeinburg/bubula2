@@ -4,6 +4,7 @@ South==0.7.6
 django-classy-tags==0.3.4.1
 django-cms==2.3.4
 django-dajaxice==0.5.2
+django-dbdump==1.1
 django-filer==0.9.1
 django-hvad==0.2
 django-mptt==0.5.4
