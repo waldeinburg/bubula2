@@ -1,5 +1,4 @@
 project: bubula2
-pyenv: env
 static_relative_dir: static
 bundle_and_minify:
   static/js/pack.js:
@@ -16,14 +15,28 @@ bundle_and_minify:
     - static/comics/css/dropdown.css
     - static/comics/css/single.css
     - static/comics/css/single-ir-sprites.css
-
-hosts:
-  - %HOST%
+host_git_repo: %HOST_GIT_REPO%
+host: %HOST%
 
 paths:
-  yuicompressor_path: '/usr/local/share/yuicompressor-2.4.8.jar'
-  apps_path: %HOST_APPS_PATH%
-  static: '{apps_path}/bubula2_static'
-  media: '{apps_path}/bubula2_media'
-  path: '{apps_path}/bubula2'
-  restart: '{path}/apache2/bin/restart'
+  yuicompressor: '/usr/local/share/yuicompressor-2.4.8.jar'
+  apps: %HOST_APPS_PATH%
+  host_git: %HOST_GIT_PATH%
+  
+  base: '{apps}/bubula2'
+#  git: '{base}/git'
+  git: '{base}/bubula2'
+  project: '{git}/bubula2'
+  env: '{base}/env'
+  restart: '{base}/apache2/bin/restart'
+  static: '{apps}/bubula2_static'
+  media: '{apps}/bubula2_media'
+  
+  test_base: '{apps}/bubula2_test'
+  test_git: '{test_base}/git'
+  test_project: '{test_git}/bubula2'
+  test_env: '{test_base}/env'
+  test_restart: '{test_base}/apache2/bin/restart'
+  test_stop: '{test_base}/apache2/bin/stop'
+  test_static: '{test_base}/static'
+  test_media: '{test_base}/media'
