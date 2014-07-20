@@ -19,7 +19,7 @@ fi
 
 TPL="$1"
 MAIN_CTX_FILE="$2"
-CTX_DIR=$(dirname "$MAIN_DATA_FILE")
+CTX_DIR=$(dirname "$MAIN_CTX_FILE")
 OUTPUT=${3:-'/dev/stdout'}
 
 process_data_file() {
@@ -46,6 +46,6 @@ process_data_file() {
     done
 }
 
-CTX=$(process_data_file "$MAIN_DATA_FILE")
+CTX=$(process_data_file "$MAIN_CTX_FILE")
 
 cat "$TPL" | sed "$(echo "$CTX" | sed -r 's/[\/&]/\\\0/g; s/([A-Z_]+)=(.*)/s\/%\1%\/\2\/g/')" > "$OUTPUT"
