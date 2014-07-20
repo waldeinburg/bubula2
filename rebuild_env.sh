@@ -13,12 +13,11 @@ done
 
 shift $((OPTIND - 1))
 
-if [ -n "$1" ]
-    ENV=$1
+test -n "$1" && ENV=$1
 
 rm -rf "$ENV"
 virtualenv "$ENV"
-. "$ENV/bin/activate"
+source "$ENV/bin/activate" || exit 1
 pip install -r envreq.txt --allow-external PIL --allow-unverified PIL
 # Install developer requirements
-[ $DEV ] && pip install -r envreq-dev.txt
+test $DEV && pip install -r envreq-dev.txt
