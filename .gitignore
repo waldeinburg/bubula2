@@ -1,6 +1,7 @@
-/private
 /fabconfig.yaml
-/settings/
+/private/*
+/settings/*
+/static/*
 
 # Default
 .project

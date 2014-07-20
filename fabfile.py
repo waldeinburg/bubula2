@@ -14,7 +14,7 @@ env.colors = True
 env.format = True
 env.config_file = 'fabconfig.yaml'
 env.config_file_tpl = 'fabconfig.tpl.yaml'
-env.private_data_file = 'private'
+env.private_data_dir = 'private'
 env.settings_tpl = 'settings.tpl.py'
 env.settings_dir = 'settings'
 env.releaseTS = int(round(time.time()))
@@ -25,7 +25,7 @@ def _msg(msg):
 
 
 def _build_fab_conf():
-    local('./simple-proc-tpl.sh {config_file_tpl} {private_data_file} {config_file}'.format(**env))
+    local('./simple-proc-tpl.sh {config_file_tpl} {private_data_dir}/fabconfig {config_file}'.format(**env))
 
 
 def _setup():
@@ -161,12 +161,10 @@ def build_settings():
 
 def _build_settings():
     _msg('building settings file')
-    local('./simple-proc-tpl.sh {settings_tpl} {private_data_file} {settings_dir}/settings-{host_string}.py'.format(**env))
+    local('./simple-proc-tpl.sh {settings_tpl} {private_data_dir}/settings_prod {settings_dir}/settings-{host_string}.py'.format(**env))
 
 
 @task
 def rebuild_fab_conf():
-    # The file private contains lines of the form
-    # VARIABLE=value
     _msg('rebuilding {config_file}'.format(**env))
     _build_fab_conf()
