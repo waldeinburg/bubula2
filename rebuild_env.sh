@@ -20,4 +20,6 @@ virtualenv "$ENV"
 source "$ENV/bin/activate" || exit 1
 pip install -r envreq.txt --allow-external PIL --allow-unverified PIL
 # Install developer requirements
-test $DEV && pip install -r envreq-dev.txt
+if [ $DEV ]; then
+    pip install -r envreq-dev.txt
+fi
