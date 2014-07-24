@@ -111,12 +111,19 @@ def _deploy_test():
     _msg('uploading settings file')
     local('scp {settings_dir}/settings_test.py {host}:{paths.test_project}/settings.py'.format(
               settings_dir=env.settings_dir, **env.config))
-    # Import prod db
+    #TODO: Import prod db
     #_msg('importing db')
     #_backup_db()
     # Sync media
+    _msg('syncing media')
+    run('rsync -av --delete {paths.media}/ {paths.test_media}/'.format(**env.config))
+    # Sync static (to make sure test is a mirror of prod)
+    _msg('syncing static')
+    run('rsync -av --delete {paths.static}/ {paths.test_static}/'.format(**env.config))
+    #TODO: Update db
     # Restart apache
-    #restart('test')
+    restart('test')
+    # Done. We will not recollect static because it will seldom be necessary.
     _msg('Run the recollect_static command to update static files.')
 
 
@@ -155,7 +162,7 @@ def restart(dest):
         'prod': env.config.paths.restart,
         'test': env.config.paths.test_restart
     }
-    _msg('restarting server')
+    _msg('restarting {0} server'.format(dest))
     run(dests[dest])
 
 
