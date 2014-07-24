@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 # Django settings for bubula2 project.
 import os
 gettext = lambda s: s
@@ -7,7 +6,6 @@ PROJECT_PATH = os.path.join(WEBAPPS_PATH, '%PROJECT_REL_PATH%')
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
-
 COMPRESS_HTML = True
 
 ADMINS = (
@@ -118,10 +116,10 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     #'base.middleware.AllowedIpMiddleware',
+    'cms.middleware.multilingual.MultilingualURLMiddleware',
     'cms.middleware.page.CurrentPageMiddleware',
     'cms.middleware.user.CurrentUserMiddleware',
     'cms.middleware.toolbar.ToolbarMiddleware',
-    'cms.middleware.language.LanguageCookieMiddleware',
     'base.middleware.MinifyHTMLMiddleware',
     'base.middleware.XUACompatibleMiddleware',
 )
@@ -135,7 +133,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'sekizai.context_processors.sekizai',
     'cms.context_processors.media',
     'django.contrib.messages.context_processors.messages',
-    'base.context_processors.page_extra'
+    'base.context_processors.page_extra',
+    'base.context_processors.settings_for_template',
 )
 
 ROOT_URLCONF = 'bubula2.urls'
@@ -169,10 +168,8 @@ INSTALLED_APPS = (
     'sekizai',
     'cms.plugins.text',
     'dajaxice',
-    'easy_thumbnails',
     'filer',
     'hvad',
-    'wymeditor',
     'hvadcontentblock',
     'copyhvadfilefield',
     'base',

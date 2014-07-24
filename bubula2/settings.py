@@ -1,5 +1,7 @@
 # Django settings for bubula2 project. Local.
 import os
+gettext = lambda s: s
+
 PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
 
 DEBUG = True
@@ -7,7 +9,7 @@ TEMPLATE_DEBUG = DEBUG
 COMPRESS_HTML = False
 
 ADMINS = (
-    ('Daniel Lundsgaard Skovenborg', 'waldeinburg@bubula2.com'),
+    ('Daniel Lundsgaard Skovenborg', 'dls@localhost'),
 )
 
 # For dev. Comment base.middleware.AllowedIpMiddleware when in production.
@@ -36,6 +38,7 @@ DATABASES = {
 # If running in a Windows environment this must be set to the same as your
 # system time zone.
 TIME_ZONE = 'Europe/Copenhagen'
+USE_TZ = False
 
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
