@@ -2,6 +2,7 @@
 /private/*
 /settings/*
 /static/*
+/test_tunnel.sh
 
 # Default
 .project
