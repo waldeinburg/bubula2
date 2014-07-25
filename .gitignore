@@ -1,7 +1,4 @@
 /fabconfig.yaml
-/private/*
-/settings/*
-/static/*
 /test_tunnel.sh
 
 # Default
