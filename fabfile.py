@@ -176,7 +176,9 @@ def restart(dest):
         'test': env.config.paths.test_restart
     }
     _msg('restarting {0} server'.format(dest))
-    run(dests[dest])
+    # Run restart command and sleep for one second.
+    # The start seemed to fail because of the disconnect for some reason.
+    run('{0} && sleep 1'.format(dests[dest]))
 
 
 @task
