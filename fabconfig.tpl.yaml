@@ -1,0 +1,51 @@
+project: bubula2
+bundle_and_minify:
+  static/js/pack.js:
+    - static/js/plugins.js
+    - static/js/main.js
+  static/css/pack.css:
+    - static/css/normalize.css
+    - static/css/main.css
+    - static/css/ir-sprites.css
+  static/comics/js/single-pack.js:
+    - static/comics/js/dropdown.js
+    - static/comics/js/single.js
+  static/comics/css/single-pack.css:
+    - static/comics/css/dropdown.css
+    - static/comics/css/single.css
+    - static/comics/css/single-ir-sprites.css
+host_git_repo: %HOST_GIT_REPO%
+host: %HOST%
+
+local:
+  static: static
+  media: media
+  private: private
+  db_dir: db
+  settings_dir: settings
+  settings_tpl: settings.tpl.py
+  
+
+# Local paths are relative
+paths:
+  yuicompressor: '/usr/local/share/yuicompressor-2.4.8.jar'
+  apps: %HOST_APPS_PATH%
+  host_git: %HOST_GIT_PATH%
+ 
+  base: '{apps}/bubula2'
+#  git: '{base}/git'
+  git: '{base}/bubula2'
+  project: '{git}/bubula2'
+  env: '{base}/env'
+  restart: '{base}/apache2/bin/restart'
+  static: '{apps}/bubula2_static'
+  media: '{apps}/bubula2_media'
+ 
+  test_base: '{apps}/bubula2_test'
+  test_git: '{test_base}/git'
+  test_project: '{test_git}/bubula2'
+  test_env: '{test_base}/env'
+  test_restart: '{test_base}/apache2/bin/restart'
+  test_stop: '{test_base}/apache2/bin/stop'
+  test_static: '{test_base}/static'
+  test_media: '{test_base}/media'
