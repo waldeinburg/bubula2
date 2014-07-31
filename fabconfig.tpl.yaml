@@ -1,5 +1,4 @@
 project: bubula2
-static_relative_dir: static
 bundle_and_minify:
   static/js/pack.js:
     - static/js/plugins.js
@@ -18,11 +17,21 @@ bundle_and_minify:
 host_git_repo: %HOST_GIT_REPO%
 host: %HOST%
 
+local:
+  static: static
+  media: media
+  private: private
+  db_dir: db
+  settings_dir: settings
+  settings_tpl: settings.tpl.py
+  
+
+# Local paths are relative
 paths:
   yuicompressor: '/usr/local/share/yuicompressor-2.4.8.jar'
   apps: %HOST_APPS_PATH%
   host_git: %HOST_GIT_PATH%
-  
+ 
   base: '{apps}/bubula2'
 #  git: '{base}/git'
   git: '{base}/bubula2'
@@ -31,7 +40,7 @@ paths:
   restart: '{base}/apache2/bin/restart'
   static: '{apps}/bubula2_static'
   media: '{apps}/bubula2_media'
-  
+ 
   test_base: '{apps}/bubula2_test'
   test_git: '{test_base}/git'
   test_project: '{test_git}/bubula2'

@@ -4,7 +4,7 @@ from os.path import exists
 from datetime import datetime
 import time
 import yaml
-from fabric.api import env, task, local, run, abort, cd, lcd
+from fabric.api import env, task, get, local, run, abort, cd, lcd, prefix
 from fabric.colors import yellow, red
 from fabric.utils import _AttributeDict
 from fabric.contrib import files
@@ -18,8 +18,6 @@ env.colorize_errors = True
 env.config_file = 'fabconfig.yaml'
 env.config_file_tpl = 'fabconfig.tpl.yaml'
 env.private_data_dir = 'private'
-env.settings_tpl = 'settings.tpl.py'
-env.settings_dir = 'settings'
 env.releaseTS = int(round(time.time()))
 env.release = datetime.fromtimestamp(env.releaseTS).strftime('%y%m%d%H%M%S')
 
@@ -27,7 +25,11 @@ def _msg(msg):
     print yellow('>>> ' + msg)
 
 
-def _build_fab_conf():
+def _env(env_paths_key):
+    return prefix('. {0}/bin/activate'.format(env.config.paths[env_paths_key]))
+
+
+def _build_fabconfig():
     local('./simple-proc-tpl.sh {config_file_tpl} {private_data_dir}/fabconfig {config_file}'.format(**env))
 
 
@@ -35,7 +37,7 @@ def _setup():
     # Load config file
     if not exists(env.config_file):
         _msg('fabconfig.yaml not found. Attempt to build from template ...')
-        _build_fab_conf()
+        _build_fabconfig()
     config_file = open(env.config_file, 'rb')
     env.config = _AttributeDict(yaml.safe_load(config_file.read()))
     config_file.close()
@@ -43,8 +45,11 @@ def _setup():
     # Set hosts from config file
     env.hosts = [ env.config.host ]
 
+    # Wrap some lists
+    env.config.local = _AttributeDict(env.config.local)
+    paths = _AttributeDict(env.config.paths) # set back below
+
     # Process paths, allowing references
-    paths = _AttributeDict(env.config.paths)
     process_again = True
     while process_again:
         process_again = False
@@ -61,7 +66,7 @@ _setup()
 # Removed S3 and gzipping and adopted to coding style
 @task
 def build_static():
-    local_recollect_static()
+    recollect_static('local')
     
     _msg('building static')
     def get_file_base_and_extension(filename):
@@ -101,59 +106,61 @@ def _deploy_test():
     # Update environment
     with cd(env.config.paths.test_git):
         if (files.exists(env.config.paths.test_env)):
-            _msg('updating environment')
-            run('. {paths.test_env}/bin/activate && pip install -r envreq.txt'.format(**env.config))
+            with _env('test_env'):
+                _msg('updating environment')
+                run('pip install -r envreq.txt')
         else:
             _msg('creating environment')
             run('./rebuild_env.sh {paths.test_env}'.format(**env.config))
     # Generate and upload settings file
     build_settings('test')
     _msg('uploading settings file')
-    local('scp {settings_dir}/settings_test.py {host}:{paths.test_project}/settings.py'.format(
-              settings_dir=env.settings_dir, **env.config))
+    local('scp {local.settings_dir}/settings_test.py {host}:{paths.test_project}/settings.py'.format(
+              **env.config))
     #TODO: Import prod db
     #_msg('importing db')
     #_backup_db()
     # Sync media
-    _msg('syncing media')
+    _msg('syncing media from prod')
     run('rsync -av --delete {paths.media}/ {paths.test_media}/'.format(**env.config))
     # Sync static (to make sure test is a mirror of prod)
-    _msg('syncing static')
-    run('rsync -av --delete {paths.static}/ {paths.test_static}/'.format(**env.config))
-    #TODO: Update db
+    _msg('syncing static from local. It is assumed that build_static has been run.')
+    run('rsync -av --delete {static_relative_dir}/ {paths.test_static}/'.format(**env.config))
+    #TODO: Update db using South
+    #_msg('updating database')
+    #with cd(env.config.paths.test_git), _env('test_env'):
+    #    run('./manage.py migrate')
     # Restart apache
     restart('test')
-    # Done. We will not recollect static because it will seldom be necessary.
-    _msg('Run the recollect_static command to update static files.')
 
 
 def _deploy_prod():
-    print red('not implemented!')
+    # Deploy master
+    local('git push {host_git_repo} master'.format(**env.config))
+    with cd(env.config.paths.host_git):
+        run('export GIT_WORK_TREE={paths.git}; git checkout master -f'.format(**env.config))
+    # Update environment
+    with cd(env.config.paths.git):
+        if (files.exists(env.config.paths.env)):
+            with _env('env'):
+                _msg('updating environment')
+                run('pip install -r envreq.txt')
+        else:
+            _msg('creating environment')
+            run('./rebuild_env.sh {paths.env}'.format(**env.config))
+    # Generate and upload settings file
+    build_settings('prod')
+    _msg('uploading settings file')
+    local('scp {local.settings_dir}/settings_prod.py {host}:{paths.project}/settings.py'.format(
+              **env.config))
+    #TODO: Update db using South
+    # Restart apache
+    restart('prod')
+    
     return
-    _msg('generating dummy config-file for the public')
-    # hack
+    #TODO: tag and release, also on github
     _msg('updating release ID and timestamp')
     local('sed -ri "'+r"s/^(release = )'(.*?)'$/\1'{release}'/; s/^(releaseTS = )([0-9]+)$/\1{releaseTS}/"+'" {project}/__init__.py'.format(project=env.config.default['project'], **env))
-    _msg('creating source tarball')
-    src_file = '{project}-{release}.tgz'.format(project=env.config.default['project'], **env)
-    env.src_file = src_file
-    res = local('cd ..; tar -czf {src_file} --exclude="*.pyc" --exclude="{project}/env" --exclude="{project}/static/*" --exclude="{project}/media/*" --exclude="{project}/settings" --exclude="{project}/{config_file}" --exclude="migrations" {project}'.format(project=env.config.default['project'], **env))
-    if res.failed:
-        abort(res.stderr)
-    env().multirun(_deploy)
-    _msg('deleting source tarball locally')
-    local('rm ../{0}'.format(src_file))
-
-
-def _deploy():
-    _msg('uploading source tarball')
-    local('scp ../{src_file} {user}@{host_string}:{media}/src/'.format(**env))
-    _msg('syncing source')
-    local('rsync -avuz --delete --exclude="*.pyc" --exclude="/settings.py" --exclude="migrations/" {project}/ {user}@{host_string}:{base}/{project}/{project}/'.format(**env), capture=False)
-    _msg('syncing remote settings')
-    local('rsync -avuz settings/settings-{host_string}.py {user}@{host_string}:{base}/{project}/{project}/settings.py'.format(**env))
-    _msg('syncing static')
-    local('rsync -avuz --delete {static_relative_dir}/ {user}@{host_string}:{static}/'.format(**env), capture=False)
 
 
 @task
@@ -187,10 +194,9 @@ def _recollect_static_local():
         _msg('removing all files in static')
         local('rm -rf *')
     _msg('collecting static')
-    local('echo yes | env python manage.py collectstatic', capture=False)
+    local('echo yes | ./manage.py collectstatic', capture=False)
 
 
-@task
 def _recollect_static_test():
     print red('not implemented!')
     return
@@ -210,6 +216,39 @@ def _backup_db():
     with cd(env.config.paths.git):
         #run('. {paths.env}/bin/activate && ./manage.py dbdump 
         pass
+
+
+@task
+def download_fixtures():
+    """Download fixtures from prod for making the dev db mirror the prod db
+    """
+    dump_filename = 'dump.gz'
+    with cd(env.config.paths.git), _env('env'):
+        run('./manage.py dumpdata | gzip - > {0}'.format(dump_filename))
+        get('{0}/{1}'.format(env.config.paths.git, dump_filename),
+            local_path=env.config.local.db_dir)
+        run('rm {0}'.format(dump_filename))
+
+
+@task
+def reset_db():
+    """Resets database to the state in the master branch.
+    """
+    print red('not implemented!')
+    return
+    # Checkout to a temporary directory, run syncdb and migrate, move, delete
+    tmp_work_tree = 'tmp_wt'
+    local('git clone --depth=1 --branch=master file://$PWD {0}'.format(tmp_work_tree))
+    with lcd(tmp_work_tree):
+        pass
+        #create environment
+    #zcat db/dump.gz | ./manage.py loaddata /dev/stdin
+
+
+@task
+def sync_media():
+    _msg('Syncing media from prod')
+    local('rsync -avuz --delete {host}:{paths.media}/ {media_relative_dir}/'.format(**env.config))
 
 
 @task
@@ -235,13 +274,15 @@ def build_settings(dest=False):
 
 def _build_settings(dest):
     _msg('building settings file for {dest}'.format(dest=dest))
-    local('./simple-proc-tpl.sh {settings_tpl} {private_data_dir}/settings_{dest} {settings_dir}/settings_{dest}.py'.format(dest=dest, **env))
+    local('./simple-proc-tpl.sh {local.settings_tpl} {local.private}/settings_{dest}\
+           {local.settings_dir}/settings_{dest}.py'.format(
+            dest=dest, **env.config))
 
 
 @task
 def build_fabconfig():
-    _msg('building {config_file}'.format(**env))
-    _build_fab_conf()
+    _msg('building {0}'.format(env.config_file))
+    _build_fabconfig()
 
 
 @task
