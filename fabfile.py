@@ -125,7 +125,7 @@ def _deploy_test():
     run('rsync -av --delete {paths.media}/ {paths.test_media}/'.format(**env.config))
     # Sync static (to make sure test is a mirror of prod)
     _msg('syncing static from local. It is assumed that build_static has been run.')
-    run('rsync -av --delete {static_relative_dir}/ {paths.test_static}/'.format(**env.config))
+    local('rsync -av --delete {local.static}/ {host}:{paths.test_static}/'.format(**env.config))
     #TODO: Update db using South
     #_msg('updating database')
     #with cd(env.config.paths.test_git), _env('test_env'):
@@ -135,6 +135,7 @@ def _deploy_test():
 
 
 def _deploy_prod():
+    #TODO: ask!
     # Deploy master
     local('git push {host_git_repo} master'.format(**env.config))
     with cd(env.config.paths.host_git):
@@ -184,13 +185,13 @@ def recollect_static(dest='local'):
     # TODO: for test (and prod) we should probably force build_static instead
     dests = {
         'local': _recollect_static_local,
-        'test': _recollect_static_prod
+        'test': _recollect_static_test
     }
     dests[dest]()
 
 
 def _recollect_static_local():
-    with lcd(env.config.static_relative_dir):
+    with lcd(env.config.local.static):
         _msg('removing all files in static')
         local('rm -rf *')
     _msg('collecting static')
@@ -248,7 +249,7 @@ def reset_db():
 @task
 def sync_media():
     _msg('Syncing media from prod')
-    local('rsync -avuz --delete {host}:{paths.media}/ {media_relative_dir}/'.format(**env.config))
+    local('rsync -avuz --delete {host}:{paths.media}/ {local.media}/'.format(**env.config))
 
 
 @task
