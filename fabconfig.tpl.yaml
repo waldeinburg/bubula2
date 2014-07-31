@@ -33,8 +33,7 @@ paths:
   host_git: %HOST_GIT_PATH%
  
   base: '{apps}/bubula2'
-#  git: '{base}/git'
-  git: '{base}/bubula2'
+  git: '{base}/git'
   project: '{git}/bubula2'
   env: '{base}/env'
   restart: '{base}/apache2/bin/restart'
