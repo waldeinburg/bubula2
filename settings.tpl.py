@@ -1,18 +1,19 @@
-# Django settings for bubula2 project. Local.
+# Django settings for bubula2 project.
 import os
 gettext = lambda s: s
+WEBAPPS_PATH = '%WEBAPPS_PATH%'
+PROJECT_PATH = os.path.join(WEBAPPS_PATH, '%PROJECT_REL_PATH%')
 
-PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
-
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
-COMPRESS_HTML = False
+COMPRESS_HTML = True
 
 ADMINS = (
-    ('Daniel Lundsgaard Skovenborg', 'dls@localhost'),
+    ('%ADMIN_NAME%', '%ADMIN_EMAIL%'),
 )
 
-# For dev. Comment base.middleware.AllowedIpMiddleware when in production.
+# For dev. TODO: Make apache handle this.
+# Comment base.middleware.AllowedIpMiddleware when in production.
 DEBUG_IPS = (
     '127.0.0.1',
 )
@@ -21,10 +22,10 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': os.path.join(PROJECT_PATH, '../db/sqlite.db'),                      # Or path to database file if using sqlite3.
-        'USER': '',                      # Not used with sqlite3.
-        'PASSWORD': '',                  # Not used with sqlite3.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '%DB_NAME%',                      # Or path to database file if using sqlite3.
+        'USER': '%DB_USER%',                      # Not used with sqlite3.
+        'PASSWORD': '%DB_PASSWD%',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -63,7 +64,7 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = os.path.join(PROJECT_PATH, '../media')
+MEDIA_ROOT = os.path.join(WEBAPPS_PATH, '%MEDIA_REL_PATH%')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -74,7 +75,7 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(PROJECT_PATH, '../static')
+STATIC_ROOT = os.path.join(WEBAPPS_PATH, '%STATIC_REL_PATH%')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -99,7 +100,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'dummy'
+SECRET_KEY = '%SECRET_KEY%'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -182,32 +183,25 @@ LOGGING = {
         'verbose': {
             'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
         },
+        'precise': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(message)s'
+        },
         'simple': {
             'format': '%(levelname)s %(message)s'
         },
     },
     'handlers': {
-        'console': {
+        'webfaction_log': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple'
-        },
-        'logfile': {
-            'level': 'DEBUG',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(PROJECT_PATH, '../../log/error.log')
+            'formatter': 'precise'
         }
     },
     'loggers': {
-        'console': {
-            'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': True
-        },
         'django.request': {
-            'handlers': ['logfile'],
+            'handlers': ['webfaction_log'],
             'level': 'ERROR',
-            'propagate': True
+            'propagate': False
         }
     }
 }

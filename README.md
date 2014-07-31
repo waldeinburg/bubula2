@@ -1,12 +1,11 @@
 # Bubula² source
 
-This is the source code of [Bubula² website](http://bubula2.com) by Daniel Lundsgaard Skovenborg, <waldeinburg@bubula2.com>.
-The source tree is a Django <http://djangoproject.com> project.
+This is the source code of the [Bubula² website](http://bubula2.com) by Daniel Lundsgaard Skovenborg, <waldeinburg@bubula2.com>.
+The source tree is a [Django](http://djangoproject.com) project, including deployment scripts. Though the project does not (at least not yet) aim to be a general system for webcomics, it may with some modifications be used as such.
 
-PLEASE NOTE THAT I DO NOT OFFER SUPPORT! You may find functions that are not used on the Bubula² website yet and not fully implemented. Please do not send me bug reports on these. If you find bugs or security holes in parts actually used on the site, I'd love to hear from you, though!
+The current state of the code is a bit peculiar because I until recently did not use version control. Therefore you may find functions that are not used on the Bubula² website yet and not fully implemented. I'm currently working on a cleanup.
 
 The file settings.py is the one used on my local copy. For security reasons you can of course not get the online version. Likewise, fabconfig-dummy.yaml is a version of my fabconfig.yaml stripped for sensitive information.
-South migrations are excluded from the tarball build.
 
 The deployment script is for the [Fabric fork](https://github.com/traviscline/fabric) by [tav](http://tav.espians.com/fabric-python-with-cleaner-api-and-parallel-deployment-support.html). Thanks to [Ask The Pony](http://www.askthepony.com)!
 
