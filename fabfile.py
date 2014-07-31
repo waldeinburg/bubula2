@@ -126,10 +126,11 @@ def _deploy_test():
     # Sync static (to make sure test is a mirror of prod)
     _msg('syncing static from local. It is assumed that build_static has been run.')
     local('rsync -av --delete {local.static}/ {host}:{paths.test_static}/'.format(**env.config))
-    #TODO: Update db using South
-    #_msg('updating database')
-    #with cd(env.config.paths.test_git), _env('test_env'):
-    #    run('./manage.py migrate')
+    # Update db
+    _msg('updating database')
+    with cd(env.config.paths.test_git), _env('test_env'):
+        run('./manage.py syncdb') # Non-South
+        run('./manage.py migrate') # South
     # Restart apache
     restart('test')
 
@@ -154,7 +155,11 @@ def _deploy_prod():
     _msg('uploading settings file')
     local('scp {local.settings_dir}/settings_prod.py {host}:{paths.project}/settings.py'.format(
               **env.config))
-    #TODO: Update db using South
+    # Update db
+    _msg('updating database')
+    with cd(env.config.paths.test_git), _env('env'):
+        run('./manage.py syncdb') # Non-South
+        run('./manage.py migrate') # South
     # Restart apache
     restart('prod')
     
