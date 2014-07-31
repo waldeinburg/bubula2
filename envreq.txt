@@ -2,12 +2,12 @@ Django==1.4.13
 PIL==1.1.7
 South==1.0
 django-classy-tags==0.3.4.1
-django-cms==2.4.3
+django-cms==2.3.4
 django-dajaxice==0.5.2
 django-dbdump==1.1
 django-filer==0.9.1
 django-hvad==0.2
-django-mptt==0.5.2
+django-mptt==0.5.4
 django-polymorphic==0.2
 django-sekizai==0.7
 django-wymeditor==1.0
