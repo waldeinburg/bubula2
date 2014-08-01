@@ -273,18 +273,23 @@ def build_translation():
 
 @task
 def build_settings(dest=False):
-    if (dest):
+    if dest:
         _build_settings(dest)
     else:
+        _build_settings('local')
         _build_settings('prod')
         _build_settings('test')
 
 
 def _build_settings(dest):
     _msg('building settings file for {dest}'.format(dest=dest))
-    local('./simple-proc-tpl.sh {local.settings_tpl} {local.private}/settings_{dest}\
-           {local.settings_dir}/settings_{dest}.py'.format(
-            dest=dest, **env.config))
+    if dest == 'local':
+        local('./simple-proc-tpl.sh {local.settings_tpl_local} {local.private}/settings_local\
+               {project}/settings.py'.format(**env.config))
+    else:
+        local('./simple-proc-tpl.sh {local.settings_tpl} {local.private}/settings_{dest}\
+               {local.settings_dir}/settings_{dest}.py'.format(dest=dest, **env.config))
+
 
 
 @task
