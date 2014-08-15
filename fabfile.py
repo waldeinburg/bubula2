@@ -89,15 +89,15 @@ def build_static():
 
 
 @task
-def deploy(dest):
+def deploy(dest, env_rebuild=False):
     dests = {
         'prod': _deploy_prod,
         'test': _deploy_test
     }
-    dests[dest]() # will fail if wrong destination is given
+    dests[dest](env_rebuild) # will fail if wrong destination is given
 
 
-def _deploy_test():
+def _deploy_test(env_rebuild):
     # Deploy current branch
     branch = local("git branch | grep '\*' | cut -d' ' -f2", capture=True)
     local('git push {host_git_repo} {branch}'.format(branch=branch, **env.config))
@@ -105,11 +105,14 @@ def _deploy_test():
         run('export GIT_WORK_TREE={paths.test_git}; git checkout {branch} -f'.format(branch=branch, **env.config))
     # Update environment
     with cd(env.config.paths.test_git):
-        if (files.exists(env.config.paths.test_env)):
+        if (not env_rebuild and files.exists(env.config.paths.test_env)):
             with _env('test_env'):
                 _msg('updating environment')
                 run('pip install -r envreq.txt')
         else:
+            if env_rebuild:
+                _msg('removing old environment')
+                run('rm -rf {paths.test_env}'.format(**env.config))
             _msg('creating environment')
             run('./rebuild_env.sh {paths.test_env}'.format(**env.config))
     # Generate and upload settings file
@@ -135,7 +138,7 @@ def _deploy_test():
     restart('test')
 
 
-def _deploy_prod():
+def _deploy_prod(env_rebuild):
     #TODO: ask!
     # Deploy master
     local('git push {host_git_repo} master'.format(**env.config))
@@ -143,11 +146,14 @@ def _deploy_prod():
         run('export GIT_WORK_TREE={paths.git}; git checkout master -f'.format(**env.config))
     # Update environment
     with cd(env.config.paths.git):
-        if (files.exists(env.config.paths.env)):
+        if (not env_rebuild and files.exists(env.config.paths.env)):
             with _env('env'):
                 _msg('updating environment')
                 run('pip install -r envreq.txt')
         else:
+            if env_rebuild:
+                _msg('removing old environment')
+                run('rm -rf {paths.env}'.format(**env.config))
             _msg('creating environment')
             run('./rebuild_env.sh {paths.env}'.format(**env.config))
     # Generate and upload settings file
