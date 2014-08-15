@@ -1,6 +1,7 @@
 /fabconfig.yaml
 /test_tunnel.sh
 /bubula2/settings.py
+/backups
 
 # Default
 .project
