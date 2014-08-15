@@ -1,15 +1,15 @@
-Django==1.4.2
+Django==1.4.13
 PIL==1.1.7
-South==0.7.6
+South==1.0
 django-classy-tags==0.3.4.1
 django-cms==2.3.4
 django-dajaxice==0.5.2
-django-dbdump==1.1
+-e git+https://github.com/waldeinburg/django-dbdump.git@2ad80c9281191b639733d2a9c49a3d9442cb503e#egg=django_dbdump-master
 django-filer==0.9.1
 django-hvad==0.2
 django-mptt==0.5.4
 django-polymorphic==0.2
-django-sekizai==0.6.1
+django-sekizai==0.7
 django-wymeditor==1.0
 easy-thumbnails==1.1
 html5lib==0.95
