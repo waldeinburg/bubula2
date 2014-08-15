@@ -24,6 +24,7 @@ local:
   db_dir: db
   settings_dir: settings
   settings_tpl: settings.tpl.py
+  settings_tpl_local: settings_local.tpl.py
   
 
 # Local paths are relative
