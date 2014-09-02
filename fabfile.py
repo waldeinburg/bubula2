@@ -2,12 +2,13 @@ import sys
 from os import chdir
 from os.path import exists
 from datetime import datetime
+import re
 import time
 import yaml
 from fabric.api import env, task, get, local, run, abort, cd, lcd, prefix
 from fabric.colors import yellow, red
 from fabric.utils import _AttributeDict
-from fabric.contrib import files
+from fabric.contrib import files, console
 from django.core import management
 
 # Fabric native settings
@@ -18,6 +19,8 @@ env.colorize_errors = True
 env.config_file = 'fabconfig.yaml'
 env.config_file_tpl = 'fabconfig.tpl.yaml'
 env.private_data_dir = 'private'
+env.config_data_file = 'fabconfig'
+env.templates_dir = 'templates'
 env.releaseTS = int(round(time.time()))
 env.release = datetime.fromtimestamp(env.releaseTS).strftime('%y%m%d%H%M%S')
 
@@ -25,39 +28,72 @@ def _msg(msg):
     print yellow('>>> ' + msg)
 
 
-def _env(env_paths_key):
-    return prefix('. {0}/bin/activate'.format(env.config.paths[env_paths_key]))
+def _env(name):
+    path = env.config.paths[name].env
+    return prefix('. {0}/bin/activate'.format(path))
+
+
+def _build_from_template(template, directory, context=None, is_local=False, filename=None):
+    """Builds a file from a Jinja2 template either locally or remote
+    """
+    if not context:
+        context = env.config
+    if not filename:
+        re_filename = re.compile(r'\.tpl((.[^.]+)?)$')
+        filename = re_filename.sub(r'\1', template)
+    file_path = '{0}/{1}'.format(directory, filename)
+    if is_local:
+        from jinja2 import Environment, FileSystemLoader
+        j_env = Environment(loader=FileSystemLoader(env.templates_dir))
+        f = open(file_path, 'w')
+        f.write(j_env.get_template(template).render(**context))
+        f.close()
+    else:
+        files.upload_template(template, file_path,
+                              context=context, template_dir=env.templates_dir, use_jinja=True, backup=False)
 
 
 def _build_fabconfig():
-    local('./simple-proc-tpl.sh {config_file_tpl} {private_data_dir}/fabconfig {config_file}'.format(**env))
+    local('./simple-proc-tpl.sh {templates_dir}/{config_file_tpl} {private_data_dir}/{config_data_file} {config_file}'.format(**env))
 
 
 def _setup():
+    def _wrap_dict(d):
+        d = _AttributeDict(d)
+        for k in d:
+            if isinstance(d[k], dict):
+                d[k] = _wrap_dict(d[k])
+        return d
+
+    def _format_dict(d, top=None):
+        if not top:
+            top = d
+        process_again = True
+        while process_again:
+            process_again = False
+            for k in d:
+                if isinstance(d[k], str):
+                    d[k] = d[k].format(**top)
+                    if d[k].find('{') != -1:
+                        process_again = True
+                elif isinstance(d[k], dict):
+                    _format_dict(d[k], top)
+    
     # Load config file
     if not exists(env.config_file):
         _msg('fabconfig.yaml not found. Attempt to build from template ...')
         _build_fabconfig()
-    config_file = open(env.config_file, 'rb')
-    env.config = _AttributeDict(yaml.safe_load(config_file.read()))
+    config_file = open(env.config_file, 'r')
+    env.config = yaml.safe_load(config_file.read())
     config_file.close()
+    # Wrap config recursively
+    env.config = _wrap_dict(env.config)
 
     # Set hosts from config file
     env.hosts = [ env.config.host ]
 
-    # Wrap some lists
-    env.config.local = _AttributeDict(env.config.local)
-    paths = _AttributeDict(env.config.paths) # set back below
-
-    # Process paths, allowing references
-    process_again = True
-    while process_again:
-        process_again = False
-        for p in paths:
-            paths[p] = paths[p].format(**paths)
-            if paths[p].find('{') != -1:
-                process_again = True
-    env.config.paths = paths
+    # Format paths, allowing references
+    _format_dict(env.config.paths)
 _setup()
 
 
@@ -66,7 +102,7 @@ _setup()
 # Removed S3 and gzipping and adopted to coding style
 @task
 def build_static():
-    recollect_static('local')
+    recollect_static()
     
     _msg('building static')
     def get_file_base_and_extension(filename):
@@ -84,8 +120,7 @@ def build_static():
         outpath_components = get_file_base_and_extension(bundle_path)
         minified_path = '{0}.min{1}'.format(outpath_components[0], outpath_components[1])
         local('java -jar {paths.yuicompressor} -v -o "{out_file}" --charset utf-8 "{in_file}"'.format(
-                  out_file=minified_path, in_file=bundle_path, **env.config),
-              capture=False)
+                  out_file=minified_path, in_file=bundle_path, **env.config))
 
 
 @task
@@ -102,36 +137,34 @@ def _deploy_test(env_rebuild):
     branch = local("git branch | grep '\*' | cut -d' ' -f2", capture=True)
     local('git push {host_git_repo} {branch}'.format(branch=branch, **env.config))
     with cd(env.config.paths.host_git):
-        run('export GIT_WORK_TREE={paths.test_git}; git checkout {branch} -f'.format(branch=branch, **env.config))
+        run('export GIT_WORK_TREE={paths.test.git}; git checkout {branch} -f'.format(branch=branch, **env.config))
     # Update environment
-    with cd(env.config.paths.test_git):
-        if (not env_rebuild and files.exists(env.config.paths.test_env)):
-            with _env('test_env'):
+    with cd(env.config.paths.test.git):
+        if (not env_rebuild and files.exists(env.config.paths.test.env)):
+            with _env('test'):
                 _msg('updating environment')
                 run('pip install -r envreq.txt')
         else:
             if env_rebuild:
                 _msg('removing old environment')
-                run('rm -rf {paths.test_env}'.format(**env.config))
+                run('rm -rf {paths.test.env}'.format(**env.config))
             _msg('creating environment')
-            run('./rebuild_env.sh {paths.test_env}'.format(**env.config))
-    # Generate and upload settings file
+            run('./rebuild_env.sh {paths.test.env}'.format(**env.config))
+    # Generate and upload settings files
     build_settings('test')
-    _msg('uploading settings file')
-    local('scp {local.settings_dir}/settings_test.py {host}:{paths.test_project}/settings.py'.format(
-              **env.config))
-    #TODO: Import prod db
-    #_msg('importing db')
-    #_backup_db()
-    # Sync media
+    # Import prod db from backup
+    _msg('importing db')
+    with cd(env.config.paths.test.git), _env('test'):
+        run('zcat {paths.backup_db_latest} | ./manage.py dbshell'.format(**env.config))
+    # Sync media. Faster than using the backup.
     _msg('syncing media from prod')
-    run('rsync -av --delete {paths.media}/ {paths.test_media}/'.format(**env.config))
-    # Sync static (to make sure test is a mirror of prod)
+    run('rsync -av --delete {paths.prod.media}/ {paths.test.media}/'.format(**env.config))
+    # Sync static from local
     _msg('syncing static from local. It is assumed that build_static has been run.')
-    local('rsync -av --delete {local.static}/ {host}:{paths.test_static}/'.format(**env.config))
+    local('rsync -av --delete {paths.local.static}/ {host}:{paths.test.static}/'.format(**env.config))
     # Update db
     _msg('updating database')
-    with cd(env.config.paths.test_git), _env('test_env'):
+    with cd(env.config.paths.test.git), _env('test'):
         run('./manage.py syncdb') # Non-South
         run('./manage.py migrate') # South
     # Restart apache
@@ -139,33 +172,37 @@ def _deploy_test(env_rebuild):
 
 
 def _deploy_prod(env_rebuild):
-    #TODO: ask!
+    if not console.confirm('Are you sure you want to deploy master branch to production?'):
+        return
     # Deploy master
     local('git push {host_git_repo} master'.format(**env.config))
     with cd(env.config.paths.host_git):
-        run('export GIT_WORK_TREE={paths.git}; git checkout master -f'.format(**env.config))
+        run('export GIT_WORK_TREE={paths.prod.git}; git checkout master -f'.format(**env.config))
     # Update environment
-    with cd(env.config.paths.git):
-        if (not env_rebuild and files.exists(env.config.paths.env)):
-            with _env('env'):
+    with cd(env.config.paths.prod.git):
+        if (not env_rebuild and files.exists(env.config.paths.prod.env)):
+            with _env('prod'):
                 _msg('updating environment')
                 run('pip install -r envreq.txt')
         else:
             if env_rebuild:
                 _msg('removing old environment')
-                run('rm -rf {paths.env}'.format(**env.config))
+                run('rm -rf {paths.prod.env}'.format(**env.config))
             _msg('creating environment')
-            run('./rebuild_env.sh {paths.env}'.format(**env.config))
-    # Generate and upload settings file
+            run('./rebuild_env.sh {paths.prod.env}'.format(**env.config))
+    # Generate and upload settings files
     build_settings('prod')
-    _msg('uploading settings file')
-    local('scp {local.settings_dir}/settings_prod.py {host}:{paths.project}/settings.py'.format(
-              **env.config))
+    # Backup db and media
+    backup(False)
     # Update db
     _msg('updating database')
-    with cd(env.config.paths.test_git), _env('env'):
+    with cd(env.config.paths.test.git), _env('prod'):
         run('./manage.py syncdb') # Non-South
         run('./manage.py migrate') # South
+    # Build and upload static files
+    build_static()
+    _msg('syncing static')
+    local('rsync -av --delete {paths.local.static}/ {host}:{paths.proc.static}/'.format(**env.config))
     # Restart apache
     restart('prod')
     
@@ -177,38 +214,27 @@ def _deploy_prod(env_rebuild):
 
 @task
 def restart(dest):
-    dests = {
-        'prod': env.config.paths.restart,
-        'test': env.config.paths.test_restart
-    }
     _msg('restarting {0} server'.format(dest))
     # Run restart command and sleep for one second.
     # The start seemed to fail because of the disconnect for some reason.
-    run('{0} && sleep 1'.format(dests[dest]))
+    run('{0} && sleep 1'.format(env.config.paths[dest].restart))
 
 
 @task
 def stop_test():
     _msg('stopping test server')
-    run(env.config.paths.test_stop)
+    run(env.config.paths.test.stop)
 
 
 @task
-def recollect_static(dest='local'):
-    # TODO: for test (and prod) we should probably force build_static instead
-    dests = {
-        'local': _recollect_static_local,
-        'test': _recollect_static_test
-    }
-    dests[dest]()
-
-
-def _recollect_static_local():
+def recollect_static():
+    # This only makes sense to do on local.
+    # On remote we should sync with a build.
     with lcd(env.config.local.static):
         _msg('removing all files in static')
         local('rm -rf *')
     _msg('collecting static')
-    local('echo yes | ./manage.py collectstatic', capture=False)
+    local('echo yes | ./manage.py collectstatic')
 
 
 def _recollect_static_test():
@@ -221,48 +247,20 @@ def _recollect_static_test():
 
 
 @task
-def backup():
-    #run db backup, media backup and download
-    print red('not implemented!')
-
-
-def _backup_db():
-    with cd(env.config.paths.git):
-        #run('. {paths.env}/bin/activate && ./manage.py dbdump 
-        pass
-
-
-@task
-def download_fixtures():
-    """Download fixtures from prod for making the dev db mirror the prod db
+def backup(download=False):
+    """Run db backup, media backup and download if specified
     """
-    dump_filename = 'dump.gz'
-    with cd(env.config.paths.git), _env('env'):
-        run('./manage.py dumpdata | gzip - > {0}'.format(dump_filename))
-        get('{0}/{1}'.format(env.config.paths.git, dump_filename),
-            local_path=env.config.local.db_dir)
-        run('rm {0}'.format(dump_filename))
-
-
-@task
-def reset_db():
-    """Resets database to the state in the master branch.
-    """
-    print red('not implemented!')
-    return
-    # Checkout to a temporary directory, run syncdb and migrate, move, delete
-    tmp_work_tree = 'tmp_wt'
-    local('git clone --depth=1 --branch=master file://$PWD {0}'.format(tmp_work_tree))
-    with lcd(tmp_work_tree):
-        pass
-        #create environment
-    #zcat db/dump.gz | ./manage.py loaddata /dev/stdin
+    with cd(env.config.paths.prod.git):
+        run('./backup.sh')
+    if download:
+        get(env.config.paths.backup_db_latest, env.config.paths.local.backup_dir)
+        get(env.config.paths.backup_media_latest, env.config.paths.local.backup_dir)
 
 
 @task
 def sync_media():
     _msg('Syncing media from prod')
-    local('rsync -avuz --delete {host}:{paths.media}/ {local.media}/'.format(**env.config))
+    local('rsync -avuz --delete {host}:{paths.prod.media}/ {paths.local.media}/'.format(**env.config))
 
 
 @task
@@ -278,24 +276,15 @@ def build_translation():
 
 
 @task
-def build_settings(dest=False):
-    if dest:
-        _build_settings(dest)
+def build_settings(dest='local'):
+    _msg('building settings files for {dest}'.format(dest=dest))
+    is_local = (dest == 'local')
+    context = dict(env.config, dest=dest)
+    if is_local:
+        _build_from_template('settings_local.tpl.py', env.config.project, is_local=True)
     else:
-        _build_settings('local')
-        _build_settings('prod')
-        _build_settings('test')
-
-
-def _build_settings(dest):
-    _msg('building settings file for {dest}'.format(dest=dest))
-    if dest == 'local':
-        local('./simple-proc-tpl.sh {local.settings_tpl_local} {local.private}/settings_local\
-               {project}/settings.py'.format(**env.config))
-    else:
-        local('./simple-proc-tpl.sh {local.settings_tpl} {local.private}/settings_{dest}\
-               {local.settings_dir}/settings_{dest}.py'.format(dest=dest, **env.config))
-
+        _build_from_template('settings.tpl.sh', env.config.paths[dest].project, context)
+    _build_from_template('backup_settings.inc.tpl.sh', env.config.paths[dest].git, context, is_local=is_local)
 
 
 @task
