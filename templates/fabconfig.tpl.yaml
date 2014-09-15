@@ -17,6 +17,17 @@ bundle_and_minify:
 host_git_repo: %HOST_GIT_REPO%
 host: %HOST%
 
+settings:
+  common:
+    secret_key: '%SECRET_KEY%'
+  local:
+    secret_key: '%LOCAL_SECRET_KEY%'
+    admin_name: '%LOCAL_ADMIN_NAME%'
+    admin_email: '%LOCAL_ADMIN_EMAIL%'
+    db_name: '%LOCAL_DB_NAME%'
+    db_user: '%LOCAL_DB_USER%'
+    db_passwd: '%LOCAL_DB_PASSWD%'
+
 # Local paths are relative
 paths:
   yuicompressor: '/usr/local/share/yuicompressor-2.4.8.jar'

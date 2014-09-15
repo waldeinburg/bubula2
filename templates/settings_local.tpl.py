@@ -9,7 +9,7 @@ TEMPLATE_DEBUG = DEBUG
 COMPRESS_HTML = False
 
 ADMINS = (
-    ('%ADMIN_NAME%', '%ADMIN_EMAIL%'),
+    ('{{ settings.local.admin_name }}', '{{ settings.local.admin_email }}'),
 )
 
 # For dev. Comment base.middleware.AllowedIpMiddleware when in production.
@@ -22,9 +22,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '%DB_NAME%',                      # Or path to database file if using sqlite3.
-        'USER': '%DB_USER%',                      # Not used with sqlite3.
-        'PASSWORD': '%DB_PASSWD%',                  # Not used with sqlite3.
+        'NAME': '{{ settings.local.db_name }}',                      # Or path to database file if using sqlite2.
+        'USER': '{{ settings.local.db_user }}',                      # Not used with sqlite3.
+        'PASSWORD': '{{ settings.local.db_passwd }}',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -99,7 +99,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'muyk_9h)ok8p@#6m2er1o49c%er=!_5-m&1*esdou(p2&v0hed'
+SECRET_KEY = '{{ settings.local.secret_key }}'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -167,6 +167,7 @@ INSTALLED_APPS = (
     'sekizai',
     'cms.plugins.text',
     'dajaxice',
+    'dbcommands'
     'filer',
     'hvad',
     'hvadcontentblock',

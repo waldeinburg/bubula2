@@ -5,7 +5,7 @@ South==1.0
 django-classy-tags==0.3.4.1
 django-cms==2.3.4
 django-dajaxice==0.5.2
--e git+https://github.com/waldeinburg/django-dbdump.git@2ad80c9281191b639733d2a9c49a3d9442cb503e#egg=django_dbdump-master
+-e git+https://github.com/waldeinburg/django-dbdump.git@e0578a46046ee24aae2f5a2f83e28e9f7913a2ad#egg=django_dbdump-master
 django-filer==0.9.1
 django-hvad==0.2
 django-mptt==0.5.4
