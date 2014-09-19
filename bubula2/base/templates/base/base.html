@@ -116,8 +116,9 @@
 				{% contentblock "copyright" %}
 			</div>
 			<div id="tech">
+				<p id="version">Version {{ VERSION }}</p>
 				<p>Powered by <a href="https://www.django-cms.org">Django CMS</a>!</p>
-				<p id="downloadSource"><a href="{{ MEDIA_URL }}src/bubula2-{{ RELEASE }}.tgz">Download source!</a> ({% trans "updated" %} {{ RELEASE_TIME|date:"d-m-Y H:i:s" }})</p>
+				<p id="source"><a href="https://github.com/waldeinburg/bubula2/">GitHub</a></p>
 			</div>
 			<div id="contact">
 				{% trans "contact"|capfirst %}: {% mailto waldeinburg@bubula2.com %}

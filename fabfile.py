@@ -5,11 +5,14 @@ from datetime import datetime
 import re
 import time
 import yaml
+
 from fabric.api import env, task, get, local, run, abort, cd, lcd, prefix
-from fabric.colors import yellow, red
+from fabric.colors import yellow, red, green
 from fabric.utils import _AttributeDict
 from fabric.contrib import files, console, project
+
 from django.core import management
+from bubula2 import version as current_project_version
 
 # Fabric native settings
 env.use_ssh_config = True
@@ -171,10 +174,11 @@ def _deploy_test(env_rebuild):
     restart('test')
 
 
-def _deploy_prod(env_rebuild):
-    if not console.confirm('Are you sure you want to deploy master branch to production?'):
+def _deploy_prod(env_rebuild, interactive=True):
+    if interactive and not console.confirm('Are you sure you want to deploy master branch to production?'):
         return
     # Deploy master
+    _msg('deploying master branch to production')
     local('git push {host_git_repo} master'.format(**env.config))
     with cd(env.config.paths.host_git):
         run('export GIT_WORK_TREE={paths.prod.git}; git checkout master -f'.format(**env.config))
@@ -205,17 +209,22 @@ def _deploy_prod(env_rebuild):
     local('rsync -av --delete {paths.local.static}/ {host}:{paths.proc.static}/'.format(**env.config))
     # Restart apache
     restart('prod')
-    
-    return
-    #TODO: tag and release, also on github
-    _msg('updating release ID and timestamp')
-    local('sed -ri "'+r"s/^(release = )'(.*?)'$/\1'{release}'/; s/^(releaseTS = )([0-9]+)$/\1{releaseTS}/"+'" {project}/__init__.py'.format(project=env.config.default['project'], **env))
 
 
+@task
 def release(version, env_rebuild=False):
-    #_msg('
-    #deploy('prod', env_rebuild)
-    pass
+    """Release: Update version, deploy and push to GitHub master"""
+    print green('Current version is {0}'.format(current_project_version))
+    if not console.confirm('Are you sure you want to release version {0}?'.format(version)):
+        return
+    _msg('updating version number')
+    local("sed -ri \"s/^version = .*/version = '{version}'/\" {project}/__init__.py".format(version=version, **env.config)) 
+    _msg('git tagging with version number')
+    local('git checkout master')
+    local("git tag -a '{0}'".format(version))
+    _deploy_prod(env_rebuild, False)
+    _msg('pushing master to github')
+    local('git push {github_repo} master'.format(**.env.config))
 
 
 @task

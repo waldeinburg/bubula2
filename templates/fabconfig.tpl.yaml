@@ -15,6 +15,7 @@ bundle_and_minify:
     - static/comics/css/single.css
     - static/comics/css/single-ir-sprites.css
 host_git_repo: %HOST_GIT_REPO%
+github_repo: %GITHUB_REPO%
 host: %HOST%
 
 settings:
