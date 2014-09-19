@@ -8,7 +8,7 @@ import yaml
 from fabric.api import env, task, get, local, run, abort, cd, lcd, prefix
 from fabric.colors import yellow, red
 from fabric.utils import _AttributeDict
-from fabric.contrib import files, console
+from fabric.contrib import files, console, project
 from django.core import management
 
 # Fabric native settings
@@ -155,7 +155,7 @@ def _deploy_test(env_rebuild):
     # Import prod db from backup
     _msg('importing db')
     with cd(env.config.paths.test.git), _env('test'):
-        run('zcat {paths.backup_db_latest} | ./manage.py dbshell'.format(**env.config))
+        run('zcat {paths.backup_db_latest} | ./manage.py dbshellnp'.format(**env.config))
     # Sync media. Faster than using the backup.
     _msg('syncing media from prod')
     run('rsync -av --delete {paths.prod.media}/ {paths.test.media}/'.format(**env.config))
@@ -212,6 +212,12 @@ def _deploy_prod(env_rebuild):
     local('sed -ri "'+r"s/^(release = )'(.*?)'$/\1'{release}'/; s/^(releaseTS = )([0-9]+)$/\1{releaseTS}/"+'" {project}/__init__.py'.format(project=env.config.default['project'], **env))
 
 
+def release(version, env_rebuild=False):
+    #_msg('
+    #deploy('prod', env_rebuild)
+    pass
+
+
 @task
 def restart(dest):
     _msg('restarting {0} server'.format(dest))
@@ -253,8 +259,33 @@ def backup(download=False):
     with cd(env.config.paths.prod.git):
         run('./backup.sh')
     if download:
-        get(env.config.paths.backup_db_latest, env.config.paths.local.backup_dir)
-        get(env.config.paths.backup_media_latest, env.config.paths.local.backup_dir)
+        download_latest_backup()
+
+
+@task
+def download_latest_backup():
+    get(env.config.paths.backup_db_latest, env.config.paths.local.backup_dir)
+    get(env.config.paths.backup_media_latest, env.config.paths.local.backup_dir)
+
+
+@task
+def import_from_prod(from_local_backup=False):
+    """Import backup to database and media
+    If argument from_local is False (default), import from server, else import from local backup.
+    Files are rsynced under all circumstances.
+    """
+    if from_local_backup:
+        local('zcat {paths.local.backup_dir}/{paths.backup_db_latest_filename} | ./manage.py dbshellnp'
+              .format(**env.config))
+    else:
+        # No obvious way of using native run().
+        local("ssh {host} 'cat {paths.backup_db_latest}' | gunzip | ./manage.py dbshellnp"
+              .format(hostname=env.host, **env.config))
+    project.rsync_project(upload=False,
+                          remote_dir=env.config.paths.prod.media+'/',
+                          local_dir=env.config.paths.local.media+'/',
+                          delete=True,
+                          exclude='/.gitignore')
 
 
 @task
@@ -281,7 +312,7 @@ def build_settings(dest='local'):
     is_local = (dest == 'local')
     context = dict(env.config, dest=dest)
     if is_local:
-        _build_from_template('settings_local.tpl.py', env.config.project, is_local=True)
+        _build_from_template('settings_local.tpl.py', env.config.project, filename='settings.py', is_local=True)
     else:
         _build_from_template('settings.tpl.sh', env.config.paths[dest].project, context)
     _build_from_template('backup_settings.inc.tpl.sh', env.config.paths[dest].git, context, is_local=is_local)
@@ -302,6 +333,7 @@ def build_requirements():
 @task
 def reset_comic_index():
     print red('not implemented')
+# Can we just use sqlsequencereset?
 #SELECT setval('comics_comic_id_seq', max(id)) FROM comics_comic;
 #SELECT setval('comics_comic_translation_id_seq', max(id)) FROM comics_comic_translation;
 #SELECT setval('comics_normalcomic_id_seq', max(id)) FROM comics_normalcomic;

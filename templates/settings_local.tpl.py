@@ -167,7 +167,7 @@ INSTALLED_APPS = (
     'sekizai',
     'cms.plugins.text',
     'dajaxice',
-    'dbcommands'
+    'dbcommands',
     'filer',
     'hvad',
     'hvadcontentblock',
