@@ -224,7 +224,7 @@ def release(version, env_rebuild=False):
     local("git tag -a '{0}'".format(version))
     _deploy_prod(env_rebuild, False)
     _msg('pushing master to github')
-    local('git push {github_repo} master'.format(**.env.config))
+    local('git push {github_repo} master'.format(**env.config))
 
 
 @task
@@ -320,10 +320,7 @@ def build_settings(dest='local'):
     _msg('building settings files for {dest}'.format(dest=dest))
     is_local = (dest == 'local')
     context = dict(env.config, dest=dest)
-    if is_local:
-        _build_from_template('settings_local.tpl.py', env.config.project, filename='settings.py', is_local=True)
-    else:
-        _build_from_template('settings.tpl.sh', env.config.paths[dest].project, context)
+    _build_from_template('settings.tpl.sh', env.config.paths[dest].project, context, is_local=is_local)
     _build_from_template('backup_settings.inc.tpl.sh', env.config.paths[dest].git, context, is_local=is_local)
 
 
