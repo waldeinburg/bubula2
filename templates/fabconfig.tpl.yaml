@@ -19,8 +19,12 @@ github_repo: %GITHUB_REPO%
 host: %HOST%
 
 settings:
-  common:
+  remote:
     secret_key: '%SECRET_KEY%'
+    admin_name: '%ADMIN_NAME%'
+    admin_email: '%ADMIN_EMAIL%'
+    db_user: '%DB_USER%'
+    db_passwd: '%DB_PASSWD%'
   local:
     secret_key: '%LOCAL_SECRET_KEY%'
     admin_name: '%LOCAL_ADMIN_NAME%'
@@ -28,6 +32,10 @@ settings:
     db_name: '%LOCAL_DB_NAME%'
     db_user: '%LOCAL_DB_USER%'
     db_passwd: '%LOCAL_DB_PASSWD%'
+  prod:
+    db_name: '%PROD_DB_NAME%'
+  test:
+    db_name: '%TEST_DB_NAME%'
 
 # Local paths are relative
 paths:

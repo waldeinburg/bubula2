@@ -1,15 +1,32 @@
 # Django settings for bubula2 project.
 import os
 gettext = lambda s: s
-WEBAPPS_PATH = '%WEBAPPS_PATH%'
-PROJECT_PATH = os.path.join(WEBAPPS_PATH, '%PROJECT_REL_PATH%')
 
+{# Set general destination (remote or local) #}
+{% if dest == 'local' %}
+{% set dest_gen = 'local' %}
+{% else %}
+{% set dest_gen = 'remote' %}
+{% endif %}
+
+{% if dest_gen == 'remote' %}
+PROJECT_PATH = '{{ paths[dest].project }}'
+{% else %}
+PROJECT_PATH = os.path.abspath(os.path.dirname(__file__))
+{% endif %}
+
+{% if dest_gen == 'remote' %}
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 COMPRESS_HTML = True
+{% else %}
+DEBUG = True
+COMPRESS_HTML = False
+{% endif %}
+
+TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
-    ('%ADMIN_NAME%', '%ADMIN_EMAIL%'),
+    ('{{ settings[dest_gen].admin_name }}', '{{ settings[dest_gen].admin_email }}'),
 )
 
 # For dev. TODO: Make apache handle this.
@@ -23,9 +40,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '%DB_NAME%',                      # Or path to database file if using sqlite3.
-        'USER': '%DB_USER%',                      # Not used with sqlite3.
-        'PASSWORD': '%DB_PASSWD%',                  # Not used with sqlite3.
+        'NAME': '{{ settings[dest].db_name }}',
+        'USER': '{{ settings[dest_gen].db_user }}',                      # Not used with sqlite3.
+        'PASSWORD': '{{ settings[dest_gen].db_passwd }}',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -64,7 +81,11 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = os.path.join(WEBAPPS_PATH, '%MEDIA_REL_PATH%')
+{% if dest_gen == 'remote' %}
+MEDIA_ROOT = '{{ paths[dest].media }}'
+{% else %}
+MEDIA_ROOT = os.path.join(PROJECT_PATH, '../media')
+{% endif %}
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
@@ -75,7 +96,11 @@ MEDIA_URL = '/media/'
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(WEBAPPS_PATH, '%STATIC_REL_PATH%')
+{% if dest_gen == 'remote' %}
+STATIC_ROOT = '{{ paths[dest].static }}'
+{% else %}
+STATIC_ROOT = os.path.join(PROJECT_PATH, '../static')
+{% endif %}
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -100,7 +125,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '%SECRET_KEY%'
+SECRET_KEY = '{{ settings[dest_gen].secret_key }}'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -177,6 +202,7 @@ INSTALLED_APPS = (
     'comics'
 )
 
+# TODO: add email for errors on prod.
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': True,
@@ -192,17 +218,37 @@ LOGGING = {
         },
     },
     'handlers': {
+{% if dest_gen == 'remote' %}
         'webfaction_log': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'precise'
-        }
+        },
+{% else %}
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+        },
+        'logfile': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': os.path.join(PROJECT_PATH, '../../log/error.log')
+        },
+{% endif %}
     },
     'loggers': {
+{% if dest == 'local' %}
+        'console': {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True
+        },
+{% endif %}
         'django.request': {
             'handlers': ['webfaction_log'],
             'level': 'ERROR',
             'propagate': False
-        }
+        },
     }
 }

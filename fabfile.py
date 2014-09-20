@@ -320,7 +320,7 @@ def build_settings(dest='local'):
     _msg('building settings files for {dest}'.format(dest=dest))
     is_local = (dest == 'local')
     context = dict(env.config, dest=dest)
-    _build_from_template('settings.tpl.sh', env.config.paths[dest].project, context, is_local=is_local)
+    _build_from_template('settings.tpl.py', env.config.paths[dest].project, context, is_local=is_local)
     _build_from_template('backup_settings.inc.tpl.sh', env.config.paths[dest].git, context, is_local=is_local)
 
 
