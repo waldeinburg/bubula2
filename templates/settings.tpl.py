@@ -246,7 +246,11 @@ LOGGING = {
         },
 {% endif %}
         'django.request': {
+{% if dest_gren == 'remote' %}
             'handlers': ['webfaction_log'],
+{% else %}
+            'handlers': ['logfile'],
+{% endif %}
             'level': 'ERROR',
             'propagate': False
         },
