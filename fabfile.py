@@ -278,11 +278,19 @@ def download_latest_backup():
 
 
 @task
-def import_from_prod(from_local_backup=False):
-    """Import backup to database and media
-    If argument from_local is False (default), import from server, else import from local backup.
-    Files are rsynced under all circumstances.
+def sync_with_prod(from_local_backup=False):
+    """Shortcut to import_db_from_prod and sync_media_with_prod
     """
+    import_db_from_prod(from_local_backup)
+    sync_media_with_prod()
+
+
+@task
+def import_db_from_prod(from_local_backup=False):
+    """Import backup to database
+    If argument from_local is False (default), import from server, else import from local backup.
+    """
+    _msg('importing database')
     if from_local_backup:
         local('zcat {paths.local.backup_dir}/{paths.backup_db_latest_filename} | ./manage.py dbshellnp'
               .format(**env.config))
@@ -290,17 +298,20 @@ def import_from_prod(from_local_backup=False):
         # No obvious way of using native run().
         local("ssh {host} 'cat {paths.backup_db_latest}' | gunzip | ./manage.py dbshellnp"
               .format(hostname=env.host, **env.config))
+
+
+@task
+def sync_media_with_prod():
+    """Sync local media folder with prod
+    Changes will be overwritten (no update).
+    """
+    _msg('syncing media with prod')
     project.rsync_project(upload=False,
                           remote_dir=env.config.paths.prod.media+'/',
                           local_dir=env.config.paths.local.media+'/',
                           delete=True,
                           exclude='/.gitignore')
 
-
-@task
-def sync_media():
-    _msg('Syncing media from prod')
-    local('rsync -avuz --delete {host}:{paths.prod.media}/ {paths.local.media}/'.format(**env.config))
 
 
 @task
