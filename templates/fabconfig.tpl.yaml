@@ -40,6 +40,8 @@ settings:
 # Local paths are relative
 paths:
   yuicompressor: '/usr/local/share/yuicompressor-2.4.8.jar'
+  env_req: envreq.txt
+  env_req_dev: envreq-dev.txt
   apps: %HOST_APPS_PATH%
   host_git: %HOST_GIT_PATH%
   backup_dir: %BACKUP_PATH%

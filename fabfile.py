@@ -1,4 +1,5 @@
 import sys
+import os
 from os import chdir
 from os.path import exists
 from datetime import datetime
@@ -164,7 +165,10 @@ def _deploy_test(env_rebuild):
     run('rsync -av --delete {paths.prod.media}/ {paths.test.media}/'.format(**env.config))
     # Sync static from local
     _msg('syncing static from local. It is assumed that build_static has been run.')
-    local('rsync -av --delete {paths.local.static}/ {host}:{paths.test.static}/'.format(**env.config))
+    project.rsync_project(local_dir=env.config.paths.local.static+'/',
+                          remote_dir=env.config.paths.test.static+'/',
+                          delete=True,
+                          exclude='/.gitignore')
     # Update db
     _msg('updating database')
     with cd(env.config.paths.test.git), _env('test'):
@@ -206,7 +210,10 @@ def _deploy_prod(env_rebuild, interactive=True):
     # Build and upload static files
     build_static()
     _msg('syncing static')
-    local('rsync -av --delete {paths.local.static}/ {host}:{paths.proc.static}/'.format(**env.config))
+    project.rsync_project(local_dir=env.config.paths.local.static+'/',
+                          remote_dir=env.config.paths.prod.static+'/',
+                          delete=True,
+                          exclude='/.gitignore')
     # Restart apache
     restart('prod')
 
@@ -245,7 +252,7 @@ def stop_test():
 def recollect_static():
     # This only makes sense to do on local.
     # On remote we should sync with a build.
-    with lcd(env.config.local.static):
+    with lcd(env.config.paths.local.static):
         _msg('removing all files in static')
         local('rm -rf *')
     _msg('collecting static')
@@ -344,7 +351,19 @@ def build_fabconfig():
 @task
 def build_requirements():
     _msg('building requirements file, excluding developer entries')
-    local('pip freeze > envreq.txt.tmp && combine envreq.txt.tmp xor envreq-dev.txt > envreq.txt && rm -f envreq.txt.tmp')
+    local('pip freeze > {paths.env_req}.tmp && combine {paths.env_req}.tmp xor {paths.env_req_dev} > {paths.env_req} && rm -f {paths.env_req}.tmp'
+          .format(**env.config))
+    # Check for conflicts. Git lines ('-e git+...) will not work but not fail.
+    _msg('Checking conflicts (normal packages only). Conflicts will result in two errors.')
+    main_file = open(env.config.paths.env_req)
+    dev_file = open(env.config.paths.env_req_dev)
+    for d_ln in dev_file:
+        d_pkg = d_ln[:d_ln.find('=')]
+        for m_ln in main_file:
+            m_pkg = m_ln[:m_ln.find('=')]
+            if (m_pkg == d_pkg):
+                print red('Conflict: {0} - {1}'.format(d_ln[:-1], m_ln[:-1]))
+        main_file.seek(os.SEEK_SET)
 
 
 @task
