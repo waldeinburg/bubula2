@@ -259,15 +259,6 @@ def recollect_static():
     local('echo yes | ./manage.py collectstatic')
 
 
-def _recollect_static_test():
-    print red('not implemented!')
-    return
-    _msg('collecting static')
-    with cd(env.path.format(**env)):
-        res = run('. {pyenv}/bin/activate; echo yes | python {project}/manage.py collectstatic')
-        print res.stdout
-
-
 @task
 def backup(download=False):
     """Run db backup, media backup and download if specified
