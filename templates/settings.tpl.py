@@ -246,7 +246,7 @@ LOGGING = {
         },
 {% endif %}
         'django.request': {
-{% if dest_gren == 'remote' %}
+{% if dest_gen == 'remote' %}
             'handlers': ['webfaction_log'],
 {% else %}
             'handlers': ['logfile'],
