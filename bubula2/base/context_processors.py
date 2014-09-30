@@ -1,4 +1,4 @@
-from bubula2 import release, releaseTS #@UnresolvedImport
+from bubula2 import version
 from django.conf import settings
 from datetime import datetime
 
@@ -11,8 +11,7 @@ def page_extra(request):
     return {
         'page_extra':
             {'subtitle':subtitle},
-        'RELEASE': release,
-        'RELEASE_TIME': datetime.fromtimestamp(releaseTS)
+        'VERSION': version,
     }
     
     

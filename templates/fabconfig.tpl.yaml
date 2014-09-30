@@ -1,0 +1,80 @@
+project: bubula2
+bundle_and_minify:
+  static/js/pack.js:
+    - static/js/plugins.js
+    - static/js/main.js
+  static/css/pack.css:
+    - static/css/normalize.css
+    - static/css/main.css
+    - static/css/ir-sprites.css
+  static/comics/js/single-pack.js:
+    - static/comics/js/dropdown.js
+    - static/comics/js/single.js
+  static/comics/css/single-pack.css:
+    - static/comics/css/dropdown.css
+    - static/comics/css/single.css
+    - static/comics/css/single-ir-sprites.css
+host_git_repo: %HOST_GIT_REPO%
+github_repo: %GITHUB_REPO%
+host: %HOST%
+
+settings:
+  remote:
+    secret_key: '%SECRET_KEY%'
+    admin_name: '%ADMIN_NAME%'
+    admin_email: '%ADMIN_EMAIL%'
+    db_user: '%DB_USER%'
+    db_passwd: '%DB_PASSWD%'
+  local:
+    secret_key: '%LOCAL_SECRET_KEY%'
+    admin_name: '%LOCAL_ADMIN_NAME%'
+    admin_email: '%LOCAL_ADMIN_EMAIL%'
+    db_name: '%LOCAL_DB_NAME%'
+    db_user: '%LOCAL_DB_USER%'
+    db_passwd: '%LOCAL_DB_PASSWD%'
+  prod:
+    db_name: '%PROD_DB_NAME%'
+  test:
+    db_name: '%TEST_DB_NAME%'
+
+# Local paths are relative
+paths:
+  yuicompressor: '/usr/local/share/yuicompressor-2.4.8.jar'
+  env_req: envreq.txt
+  env_req_dev: envreq-dev.txt
+  apps: %HOST_APPS_PATH%
+  host_git: %HOST_GIT_PATH%
+  backup_dir: %BACKUP_PATH%
+  backup_db_latest_filename: 'bubula2-db-latest.sql.gz'
+  backup_db_latest: '{backup_dir}/{backup_db_latest_filename}' # prod
+  backup_media_latest_filename: 'bubula2-media-latest.tar.gz'
+  backup_media_latest: '{backup_dir}/{backup_media_latest_filename}' # prod
+
+  local:
+    git: .
+    project: bubula2
+    env: env
+    static: static
+    media: media
+    backup_dir: %BACKUP_PATH_LOCAL%
+
+  prod:
+    base: '{apps}/bubula2'
+    git: '{prod.base}/git'
+    project: '{prod.git}/bubula2'
+    env: '{prod.base}/env'
+    restart: '{prod.base}/apache2/bin/restart'
+    static: '{apps}/bubula2_static'
+    media: '{apps}/bubula2_media'
+    backup_dir: '{backup_dir}'
+
+  test:
+    base: '{apps}/bubula2_test'
+    git: '{test.base}/git'
+    project: '{test.git}/bubula2'
+    env: '{test.base}/env'
+    restart: '{test.base}/apache2/bin/restart'
+    static: '{test.base}/static'
+    media: '{test.base}/media'
+    stop: '{test.base}/apache2/bin/stop'
+    backup_dir: '{test.base}/backup'
