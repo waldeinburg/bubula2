@@ -25,8 +25,6 @@ env.config_file_tpl = 'fabconfig.tpl.yaml'
 env.private_data_dir = 'private'
 env.config_data_file = 'fabconfig'
 env.templates_dir = 'templates'
-env.releaseTS = int(round(time.time()))
-env.release = datetime.fromtimestamp(env.releaseTS).strftime('%y%m%d%H%M%S')
 
 def _msg(msg):
     print yellow('>>> ' + msg)
@@ -224,10 +222,14 @@ def release(version, env_rebuild=False):
     print green('Current version is {0}'.format(current_project_version))
     if not console.confirm('Are you sure you want to release version {0}?'.format(version)):
         return
-    _msg('updating version number')
-    local("sed -ri \"s/^version = .*/version = '{version}'/\" {project}/__init__.py".format(version=version, **env.config)) 
-    _msg('git tagging with version number')
     local('git checkout master')
+    _msg('updating version number')
+    version_file = '{project}/__init__.py'.format(**env.config)
+    local("sed -ri \"s/^version = .*/version = '{version}'/\" {version_file}"
+          .format(version=version, version_file=version_file)) 
+    local("git commit {version_file} -m 'Updated version to {version}.'"
+          .format(version=version, version_file=version_file)) 
+    _msg('git tagging with version number')
     local("git tag -a '{0}'".format(version))
     _deploy_prod(env_rebuild, False)
     _msg('pushing master to github')
