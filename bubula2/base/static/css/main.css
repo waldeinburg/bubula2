@@ -501,7 +501,7 @@ span.ir, a.ir {
 		font-size: 10pt;
 	}
 
-	#miscMenuCnt, #downloadSource, .menu {
+	#miscMenuCnt, #source, .menu {
 		display: none !important;
 	}
 	
