@@ -232,8 +232,10 @@ def release(version, env_rebuild=False):
     _msg('git tagging with version number')
     local("git tag -a '{0}'".format(version))
     _deploy_prod(env_rebuild, False)
-    _msg('pushing master to github')
-    local('git push {github_repo} master'.format(**env.config))
+    _msg('pushing master and tag to github')
+    repo = env.config.github_repo
+    local('git push {0} master'.format(repo))
+    local('git push {0} {1}'.format(repo, version))
 
 
 @task
