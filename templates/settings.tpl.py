@@ -155,8 +155,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.media',
     'django.core.context_processors.static',
-    'sekizai.context_processors.sekizai',
     'cms.context_processors.media',
+    'sekizai.context_processors.sekizai',
     'django.contrib.messages.context_processors.messages',
     'base.context_processors.page_extra',
     'base.context_processors.settings_for_template',
@@ -252,7 +252,7 @@ LOGGING = {
             'handlers': ['logfile'],
 {% endif %}
             'level': 'ERROR',
-            'propagate': False
+            'propagate': True
         },
     }
 }
