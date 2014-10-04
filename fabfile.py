@@ -154,6 +154,9 @@ def _deploy_test(env_rebuild):
             run('./rebuild_env.sh {paths.test.env}'.format(**env.config))
     # Generate and upload settings files
     build_settings('test')
+    # Compile messages
+    with cd(env.config.paths.test.project):
+        run('../manage.py compilemessages')
     # Import prod db from backup
     _msg('importing db')
     with cd(env.config.paths.test.git), _env('test'):
@@ -198,6 +201,9 @@ def _deploy_prod(env_rebuild, interactive=True):
             run('./rebuild_env.sh {paths.prod.env}'.format(**env.config))
     # Generate and upload settings files
     build_settings('prod')
+    # Compile messages
+    with cd(env.config.paths.prod.project):
+        run('../manage.py compilemessages')
     # Backup db and media
     backup(False)
     # Update db
@@ -319,11 +325,11 @@ def sync_media_with_prod():
 @task
 def build_translation():
     # http://blog.brendel.com/2010/09/how-to-customize-djangos-default.html
-    chdir(env.config.default['project'])
+    chdir(env.config.paths.local.project)
     _msg('translating all messages')
     management.call_command('makemessages', all=True)
     _msg('Removing commented-out manual messages')
-    local(r"find locale -name 'django.po' -exec sed s/^\#\~\ // -i {{}} \;")
+    local(r"find locale -name 'django.po' -exec sed s/^\#\~\ // -i {} \;")
     _msg('Compiling messages')
     management.call_command('compilemessages')
 
