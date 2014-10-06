@@ -224,7 +224,8 @@ def _deploy_prod(env_rebuild, interactive=True):
 
 @task
 def release(version, env_rebuild=False):
-    """Release: Update version, deploy and push to GitHub master"""
+    """Release: Update version, deploy and push to GitHub master
+    """
     print green('Current version is {0}'.format(current_project_version))
     if not console.confirm('Are you sure you want to release version {0}?'.format(version)):
         return
@@ -242,6 +243,63 @@ def release(version, env_rebuild=False):
     repo = env.config.github_repo
     local('git push {0} master'.format(repo))
     local('git push {0} {1}'.format(repo, version))
+
+
+@task
+def rollback(version=None, restore_db='ask', restore_media='ask', backup='latest'):
+    """Roll back to previous version (git tag) or a specific one if stated
+
+    Argument 'backup' can be YYMMDD-hhmm (must exist) if latest will not work.
+    """
+    # Most of this is copied from deploy, sometimes with small modifications
+    if not version:
+        # List tags and get second last line
+        version = local("git tag -l | sed -n '$! h; $ {g; p}' |  tr -d '\\n'", capture=True)
+    print green('Current version is {0}'.format(current_project_version))
+    if not console.confirm('Are you sure you want to roll back to version {0}?'.format(version),
+                           default=False):
+        return
+    if restore_db == 'ask':
+        restore_db = console.confirm('Restore database?', default=False)
+    if restore_media == 'ask':
+        restore_media = console.confirm('Restore media?', default=False)
+    # Get current branch. We'll change back to it in the last step.
+    branch = local("git branch | grep '\*' | cut -d' ' -f2", capture=True)
+    # Check out tag, also locally for generating settings and static
+    _msg('checking out the specified branch')
+    local('git checkout {0}'.format(version))
+    with cd(env.config.paths.host_git):
+        run('export GIT_WORK_TREE={paths.prod.git}; git checkout {version} -f'
+            .format(version=version, **env.config))
+    # Force rebuild of environment
+    with cd(env.config.paths.prod.git):
+        _msg('removing old environment')
+        run('rm -rf {paths.prod.env}'.format(**env.config))
+        _msg('creating environment')
+        run('./rebuild_env.sh {paths.prod.env}'.format(**env.config))
+    # Generate and upload settings files
+    build_settings('prod')
+    # Compile messages
+    with cd(env.config.paths.prod.project):
+        run('../manage.py compilemessages')
+    # Restore from backup db and media. 
+    if restore_db:
+        with cd(env.config.paths.prod.git), _env('prod'):
+            run('zcat {paths.backup_db_latest} | ./manage.py dbshellnp'.format(**env.config))
+    if restore_media:
+        print red('Media restore not implemented!') # TODO; better fix the path in the tarball first
+    # We don't need to update db afterwards because it was made in the previous version.
+    # Build and upload static files
+    build_static()
+    _msg('syncing static')
+    project.rsync_project(local_dir=env.config.paths.local.static+'/',
+                          remote_dir=env.config.paths.prod.static+'/',
+                          delete=True,
+                          exclude='/.gitignore')
+    # Restart apache
+    restart('prod')
+    # Change back to the branch used
+    local('git checkout {0}'.format(branch))
 
 
 @task
@@ -319,7 +377,6 @@ def sync_media_with_prod():
                           local_dir=env.config.paths.local.media+'/',
                           delete=True,
                           exclude='/.gitignore')
-
 
 
 @task
