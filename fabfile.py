@@ -15,6 +15,9 @@ from fabric.contrib import files, console, project
 from django.core import management
 from bubula2 import version as current_project_version
 
+# Allow import of deploy_hooks.py
+sys.path.append(os.path.dirname(__file__))
+
 # Fabric native settings
 env.use_ssh_config = True
 env.colorize_errors = True
@@ -57,6 +60,21 @@ def _build_from_template(template, directory, context=None, is_local=False, file
 
 def _build_fabconfig():
     local('./simple-proc-tpl.sh {templates_dir}/{config_file_tpl} {private_data_dir}/{config_data_file} {config_file}'.format(**env))
+
+
+def _run_deploy_hook(dest, hook_str):
+    """Run a deploy hook defined in releade_hooks.py if existing
+    """
+    try:
+        import deploy_hooks
+    except ImportError:
+        return
+    try:
+        hook_fn = getattr(deploy_hooks, 'hook_' + hook_str)
+    except AttributeError:
+        return
+    _msg('running hook {0}'.format(hook_str))
+    hook_fn(dest)
 
 
 def _setup():
@@ -174,6 +192,7 @@ def _deploy_test(env_rebuild):
     _msg('updating database')
     with cd(env.config.paths.test.git), _env('test'):
         run('./manage.py syncdb') # Non-South
+        _run_deploy_hook('test', 'syncdb__migrate')
         run('./manage.py migrate') # South
     # Restart apache
     restart('test')
@@ -210,6 +229,7 @@ def _deploy_prod(env_rebuild, interactive=True):
     _msg('updating database')
     with cd(env.config.paths.test.git), _env('prod'):
         run('./manage.py syncdb') # Non-South
+        _run_deploy_hook('prod', 'syncdb__migrate')
         run('./manage.py migrate') # South
     # Build and upload static files
     build_static()
