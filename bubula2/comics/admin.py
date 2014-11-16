@@ -19,7 +19,7 @@ class ComicInfoForm(InlineModelForm):
     class Meta:
         model = ComicInfo
 
-    content = forms.CharField(widget=forms.Textarea)
+    content = forms.CharField(widget=forms.Textarea, help_text='Markdown')
     
 
 

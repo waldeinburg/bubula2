@@ -36,6 +36,10 @@
 		<li><span class="ir ir-comics-latest-small disabledLink"></span></li>
 	{% endif %}
 </ul>
+{% if comic.info %}
+	{% load markup %}
+	<div id="intro">{{ comic.info.content|markdown }}</div>
+{% endif %}
 <div id="comic">
 	<a href="#comic">{% include comicTemplate %}</a>
 </div>
