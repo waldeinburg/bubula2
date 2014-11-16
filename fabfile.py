@@ -173,7 +173,8 @@ def _deploy_test(env_rebuild):
     # Generate and upload settings files
     build_settings('test')
     # Compile messages
-    with cd(env.config.paths.test.project):
+    _msg('compiling messages')
+    with cd(env.config.paths.test.project), _env('test'):
         run('../manage.py compilemessages')
     # Import prod db from backup
     _msg('importing db')
@@ -221,7 +222,8 @@ def _deploy_prod(env_rebuild, interactive=True):
     # Generate and upload settings files
     build_settings('prod')
     # Compile messages
-    with cd(env.config.paths.prod.project):
+    _msg('compiling messages')
+    with cd(env.config.paths.prod.project), _env('prod'):
         run('../manage.py compilemessages')
     # Backup db and media
     backup(False)
