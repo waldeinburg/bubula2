@@ -1,8 +1,9 @@
+from django import forms
 from django.contrib import admin
-from hvad.admin import TranslatableAdmin, TranslatableStackedInline
+from hvad.admin import TranslatableAdmin, TranslatableStackedInline, InlineModelForm
 from copyhvadfilefield.adminhelper import dajaxiceScript, copyhvadfilefieldScript
 from copyhvadfilefield.register import register_translation_with_file_field_models
-from comics.models import Comic, NormalComic, ScriptedComic, ComicImageFile, ComicScriptFile, ComicCSSFile
+from comics.models import Comic, ComicInfo, NormalComic, ScriptedComic, ComicImageFile, ComicScriptFile, ComicCSSFile
 import comics.models
 
 register_translation_with_file_field_models(
@@ -11,6 +12,22 @@ register_translation_with_file_field_models(
     ComicScriptFile,
     ComicCSSFile
 )
+
+
+
+class ComicInfoForm(InlineModelForm):
+    class Meta:
+        model = ComicInfo
+
+    content = forms.CharField(widget=forms.Textarea)
+    
+
+
+class ComicInfoInline(TranslatableStackedInline):
+    model = ComicInfo
+    form = ComicInfoForm
+    extra = 0
+    
 
 
 class ComicAdmin(TranslatableAdmin):
@@ -38,6 +55,7 @@ class ComicAdmin(TranslatableAdmin):
             {'model': getattr(comics.models, comicType[0])}
         )
         inlines.append(T)
+    inlines.append(ComicInfoInline)
 admin.site.register(Comic, ComicAdmin)
 
 
