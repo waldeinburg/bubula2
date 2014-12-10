@@ -117,6 +117,11 @@ def _setup():
 _setup()
 
 
+@task
+def test_deploy_hook(hook_name):
+    _run_deploy_hook('local', hook_name)
+
+
 # This is taken from
 # https://github.com/tkopczuk/one_second_django_deployment/blob/master/fabfile.py
 # Removed S3 and gzipping and adopted to coding style
