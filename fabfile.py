@@ -189,7 +189,8 @@ def _deploy_test(env_rebuild):
     _msg('syncing media from prod')
     run('rsync -av --delete {paths.prod.media}/ {paths.test.media}/'.format(**env.config))
     # Sync static from local
-    _msg('syncing static from local. It is assumed that build_static has been run.')
+    build_static()
+    _msg('syncing static')
     project.rsync_project(local_dir=env.config.paths.local.static+'/',
                           remote_dir=env.config.paths.test.static+'/',
                           delete=True,
