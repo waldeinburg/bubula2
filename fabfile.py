@@ -184,6 +184,7 @@ def _deploy_test(env_rebuild):
     # Import prod db from backup
     _msg('importing db')
     with cd(env.config.paths.test.git), _env('test'):
+        run('./manage.py resetdb --noinput')
         run('zcat {paths.backup_db_latest} | ./manage.py dbshellnp'.format(**env.config))
     # Sync media. Faster than using the backup.
     _msg('syncing media from prod')
