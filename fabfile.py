@@ -15,6 +15,9 @@ from fabric.contrib import files, console, project
 from django.core import management
 from bubula2 import version as current_project_version
 
+# Allow import of deploy_hooks.py
+sys.path.append(os.path.dirname(__file__))
+
 # Fabric native settings
 env.use_ssh_config = True
 env.colorize_errors = True
@@ -59,6 +62,21 @@ def _build_fabconfig():
     local('./simple-proc-tpl.sh {templates_dir}/{config_file_tpl} {private_data_dir}/{config_data_file} {config_file}'.format(**env))
 
 
+def _run_deploy_hook(dest, hook_str):
+    """Run a deploy hook defined in releade_hooks.py if existing
+    """
+    try:
+        import deploy_hooks
+    except ImportError:
+        return
+    try:
+        hook_fn = getattr(deploy_hooks, 'hook_' + hook_str)
+    except AttributeError:
+        return
+    _msg('running hook {0}'.format(hook_str))
+    hook_fn(dest)
+
+
 def _setup():
     def _wrap_dict(d):
         d = _AttributeDict(d)
@@ -97,6 +115,11 @@ def _setup():
     # Format paths, allowing references
     _format_dict(env.config.paths)
 _setup()
+
+
+@task
+def test_deploy_hook(hook_name):
+    _run_deploy_hook('local', hook_name)
 
 
 # This is taken from
@@ -155,17 +178,20 @@ def _deploy_test(env_rebuild):
     # Generate and upload settings files
     build_settings('test')
     # Compile messages
-    with cd(env.config.paths.test.project):
+    _msg('compiling messages')
+    with cd(env.config.paths.test.project), _env('test'):
         run('../manage.py compilemessages')
     # Import prod db from backup
     _msg('importing db')
     with cd(env.config.paths.test.git), _env('test'):
+        run('./manage.py resetdb --noinput')
         run('zcat {paths.backup_db_latest} | ./manage.py dbshellnp'.format(**env.config))
     # Sync media. Faster than using the backup.
     _msg('syncing media from prod')
     run('rsync -av --delete {paths.prod.media}/ {paths.test.media}/'.format(**env.config))
     # Sync static from local
-    _msg('syncing static from local. It is assumed that build_static has been run.')
+    build_static()
+    _msg('syncing static')
     project.rsync_project(local_dir=env.config.paths.local.static+'/',
                           remote_dir=env.config.paths.test.static+'/',
                           delete=True,
@@ -174,6 +200,7 @@ def _deploy_test(env_rebuild):
     _msg('updating database')
     with cd(env.config.paths.test.git), _env('test'):
         run('./manage.py syncdb') # Non-South
+        _run_deploy_hook('test', 'syncdb__migrate')
         run('./manage.py migrate') # South
     # Restart apache
     restart('test')
@@ -202,7 +229,8 @@ def _deploy_prod(env_rebuild, interactive=True):
     # Generate and upload settings files
     build_settings('prod')
     # Compile messages
-    with cd(env.config.paths.prod.project):
+    _msg('compiling messages')
+    with cd(env.config.paths.prod.project), _env('prod'):
         run('../manage.py compilemessages')
     # Backup db and media
     backup(False)
@@ -210,6 +238,7 @@ def _deploy_prod(env_rebuild, interactive=True):
     _msg('updating database')
     with cd(env.config.paths.test.git), _env('prod'):
         run('./manage.py syncdb') # Non-South
+        _run_deploy_hook('prod', 'syncdb__migrate')
         run('./manage.py migrate') # South
     # Build and upload static files
     build_static()

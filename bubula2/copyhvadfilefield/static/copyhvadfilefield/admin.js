@@ -1,3 +1,5 @@
+"use strict";
+
 django.jQuery(document).ready(function($) {
 	var pEmptyForm = /^[a-z]+-empty$/,
 		pModelKey = /^[a-z]+/,
@@ -25,13 +27,20 @@ django.jQuery(document).ready(function($) {
 			appendTo(buttonCnt).
 			click(function(e) {
 				e.preventDefault();
-				var curLang = get_site_param('language'),
+				var args,
+					curLang = get_site_param('language'),
 					modelKey = objDOMId.match(pModelKey)[0],
 					model = CHFF_MODELS[modelKey], // must be defined by other included script
 					inputName = inputField.attr('name'),
 					field = inputName.match( new RegExp(objDOMId+'-([a-zA-Z0-9_]+)$') )[1];
 				if (!curLang) {
 					curLang = $('html').attr('lang');
+				}
+				args = {
+					'curLang': curLang,
+					'modelStr': model,
+					'field': field,
+					'objId': objId
 				}
 				Dajaxice.copyhvadfilefield.copy_from_other(
 					function(data) {
@@ -48,12 +57,7 @@ django.jQuery(document).ready(function($) {
 							buttonCnt.append('<span style="padding-left:1em;">Set to "'+data['newFile']+'"</span>');
 						}
 					},
-					{
-						'curLang': curLang,
-						'modelStr': model,
-						'field': field,
-						'objId': objId
-					}
+					args
 				);
 				return false;
 			});;
