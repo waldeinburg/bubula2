@@ -1,13 +1,25 @@
 # Bubula² source
 
 This is the source code of the [Bubula² website](http://bubula2.com) by Daniel Lundsgaard Skovenborg, <waldeinburg@bubula2.com>.
-The source tree is a [Django](http://djangoproject.com) project, including deployment scripts. Though the project does not (at least not yet) aim to be a general system for webcomics, it may with some modifications be used as such.
+The source tree is a [Django](http://djangoproject.com) project, including deployment scripts for [Fabric](http://www.fabfile.org). Though the project does not (at least not yet) aim to be a general system for webcomics, it may with some modifications be used as such.
 
 The current state of the code is a bit peculiar because I until recently did not use version control. Therefore you may find functions that are not used on the Bubula² website yet and not fully implemented. I'm currently working on a cleanup.
 
-The file settings.py is the one used on my local copy. For security reasons you can of course not get the online version. Likewise, fabconfig-dummy.yaml is a version of my fabconfig.yaml stripped for sensitive information.
 
-The deployment script is for the [Fabric fork](https://github.com/traviscline/fabric) by [tav](http://tav.espians.com/fabric-python-with-cleaner-api-and-parallel-deployment-support.html). Thanks to [Ask The Pony](http://www.askthepony.com)!
+## Setup
+
+You want to try out the code? Ok, here's how to create the environment:
+
+Install [virtualenv](https://virtualenv.pypa.io) and run the following to build the environment with developer specific modules and activate the environment:
+
+    $ ./rebuild_env.sh -d
+    $ . env/bin/activate 
+
+Now create a file `private/fabconfig` and define (sh style) at least the database specific `LOCAL` prefixed variables referenced in `templates/fabconfig.tpl.yaml` (name, user, password). Now you are ready to build the Django settings file:
+
+    $ fab build_settings
+
+It's all Django from there (unless you want to deploy, of course).
 
 
 ## Licenses
