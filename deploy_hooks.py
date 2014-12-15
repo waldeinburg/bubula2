@@ -5,5 +5,4 @@ def hook_syncdb__migrate(dest):
     cmd = local if dest == 'local' else run
     with cd(env.config.paths[dest].git), _env(dest):
         cmd('./manage.py migrate comics 0001 --fake') # Use migrations for app
-        cmd('./manage.py migrate comics') # Rest of migrations
 
