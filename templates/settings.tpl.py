@@ -155,8 +155,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.request',
     'django.core.context_processors.media',
     'django.core.context_processors.static',
-    'sekizai.context_processors.sekizai',
     'cms.context_processors.media',
+    'sekizai.context_processors.sekizai',
     'django.contrib.messages.context_processors.messages',
     'base.context_processors.page_extra',
     'base.context_processors.settings_for_template',
@@ -182,6 +182,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.markup',
     'django.contrib.admin',
     'dbdump',
     # Uncomment the next line to enable admin documentation:
@@ -252,7 +253,7 @@ LOGGING = {
             'handlers': ['logfile'],
 {% endif %}
             'level': 'ERROR',
-            'propagate': False
+            'propagate': True
         },
     }
 }

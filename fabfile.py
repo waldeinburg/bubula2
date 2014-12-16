@@ -15,6 +15,9 @@ from fabric.contrib import files, console, project
 from django.core import management
 from bubula2 import version as current_project_version
 
+# Allow import of deploy_hooks.py
+sys.path.append(os.path.dirname(__file__))
+
 # Fabric native settings
 env.use_ssh_config = True
 env.colorize_errors = True
@@ -59,6 +62,21 @@ def _build_fabconfig():
     local('./simple-proc-tpl.sh {templates_dir}/{config_file_tpl} {private_data_dir}/{config_data_file} {config_file}'.format(**env))
 
 
+def _run_deploy_hook(dest, hook_str):
+    """Run a deploy hook defined in releade_hooks.py if existing
+    """
+    try:
+        import deploy_hooks
+    except ImportError:
+        return
+    try:
+        hook_fn = getattr(deploy_hooks, 'hook_' + hook_str)
+    except AttributeError:
+        return
+    _msg('running hook {0}'.format(hook_str))
+    hook_fn(dest)
+
+
 def _setup():
     def _wrap_dict(d):
         d = _AttributeDict(d)
@@ -99,6 +117,11 @@ def _setup():
 _setup()
 
 
+@task
+def test_deploy_hook(hook_name):
+    _run_deploy_hook('local', hook_name)
+
+
 # This is taken from
 # https://github.com/tkopczuk/one_second_django_deployment/blob/master/fabfile.py
 # Removed S3 and gzipping and adopted to coding style
@@ -126,99 +149,75 @@ def build_static():
 
 
 @task
-def deploy(dest, env_rebuild=False):
-    dests = {
-        'prod': _deploy_prod,
-        'test': _deploy_test
-    }
-    dests[dest](env_rebuild) # will fail if wrong destination is given
-
-
-def _deploy_test(env_rebuild):
-    # Deploy current branch
-    branch = local("git branch | grep '\*' | cut -d' ' -f2", capture=True)
+def deploy(dest, env_rebuild=False, interactive=True):
+    if dest not in ('prod', 'test'):
+        print red('Destination argument must be "prod" or "test"!')
+        return
+    # For prod, confirm.
+    if dest == 'master' and interactive and not console.confirm('Are you sure you want to deploy master branch to production?'):
+        return
+    # Deploy master or current branch if test.
+    if dest == 'prod':
+        branch = 'master'
+    else:
+        branch = local("git branch | grep '\*' | cut -d' ' -f2", capture=True)
+    _msg('deploying branch {0} to {1}'.format(branch, dest))
     local('git push {host_git_repo} {branch}'.format(branch=branch, **env.config))
     with cd(env.config.paths.host_git):
-        run('export GIT_WORK_TREE={paths.test.git}; git checkout {branch} -f'.format(branch=branch, **env.config))
+        run('export GIT_WORK_TREE={dest_git}; git checkout {branch} -f'.format(
+                branch=branch, dest_git=env.config.paths[dest].git))
     # Update environment
-    with cd(env.config.paths.test.git):
-        if (not env_rebuild and files.exists(env.config.paths.test.env)):
-            with _env('test'):
+    with cd(env.config.paths[dest].git):
+        if (not env_rebuild and files.exists(env.config.paths[dest].env)):
+            with _env(dest):
                 _msg('updating environment')
                 run('pip install -r envreq.txt')
         else:
             if env_rebuild:
                 _msg('removing old environment')
-                run('rm -rf {paths.test.env}'.format(**env.config))
+                run('rm -rf {0}'.format(env.config.paths[dest].env))
             _msg('creating environment')
-            run('./rebuild_env.sh {paths.test.env}'.format(**env.config))
+            run('./rebuild_env.sh {0}'.format(env.config.paths[dest].env))
     # Generate and upload settings files
-    build_settings('test')
-    # Import prod db from backup
-    _msg('importing db')
-    with cd(env.config.paths.test.git), _env('test'):
-        run('zcat {paths.backup_db_latest} | ./manage.py dbshellnp'.format(**env.config))
-    # Sync media. Faster than using the backup.
-    _msg('syncing media from prod')
-    run('rsync -av --delete {paths.prod.media}/ {paths.test.media}/'.format(**env.config))
-    # Sync static from local
-    _msg('syncing static from local. It is assumed that build_static has been run.')
-    project.rsync_project(local_dir=env.config.paths.local.static+'/',
-                          remote_dir=env.config.paths.test.static+'/',
-                          delete=True,
-                          exclude='/.gitignore')
-    # Update db
-    _msg('updating database')
-    with cd(env.config.paths.test.git), _env('test'):
-        run('./manage.py syncdb') # Non-South
-        run('./manage.py migrate') # South
-    # Restart apache
-    restart('test')
-
-
-def _deploy_prod(env_rebuild, interactive=True):
-    if interactive and not console.confirm('Are you sure you want to deploy master branch to production?'):
-        return
-    # Deploy master
-    _msg('deploying master branch to production')
-    local('git push {host_git_repo} master'.format(**env.config))
-    with cd(env.config.paths.host_git):
-        run('export GIT_WORK_TREE={paths.prod.git}; git checkout master -f'.format(**env.config))
-    # Update environment
-    with cd(env.config.paths.prod.git):
-        if (not env_rebuild and files.exists(env.config.paths.prod.env)):
-            with _env('prod'):
-                _msg('updating environment')
-                run('pip install -r envreq.txt')
-        else:
-            if env_rebuild:
-                _msg('removing old environment')
-                run('rm -rf {paths.prod.env}'.format(**env.config))
-            _msg('creating environment')
-            run('./rebuild_env.sh {paths.prod.env}'.format(**env.config))
-    # Generate and upload settings files
-    build_settings('prod')
-    # Backup db and media
-    backup(False)
-    # Update db
-    _msg('updating database')
-    with cd(env.config.paths.test.git), _env('prod'):
-        run('./manage.py syncdb') # Non-South
-        run('./manage.py migrate') # South
+    build_settings(dest)
+    # Compile messages
+    _msg('compiling messages')
+    with cd(env.config.paths[dest].project), _env(dest):
+        run('../manage.py compilemessages')
+    # Destination specific: backup for prod and import of prod data for test.
+    if dest == 'prod':
+        # Backup db and media
+        backup(False)
+    else:
+        # Import prod db from backup
+        _msg('importing db')
+        with cd(env.config.paths.test.git), _env('test'):
+            run('./manage.py resetdb --noinput')
+            run('zcat {paths.backup_db_latest} | ./manage.py dbshellnp'.format(**env.config))
+        # Sync media. Faster than using the backup.
+        _msg('syncing media from prod')
+        run('rsync -av --delete {paths.prod.media}/ {paths.test.media}/'.format(**env.config))
     # Build and upload static files
     build_static()
     _msg('syncing static')
     project.rsync_project(local_dir=env.config.paths.local.static+'/',
-                          remote_dir=env.config.paths.prod.static+'/',
+                          remote_dir=env.config.paths[dest].static+'/',
                           delete=True,
                           exclude='/.gitignore')
+    # Update db
+    _msg('updating database')
+    with cd(env.config.paths[dest].git), _env(dest):
+        run('./manage.py syncdb') # Non-South
+        _run_deploy_hook(dest, 'syncdb__migrate')
+        run('./manage.py migrate') # South
     # Restart apache
-    restart('prod')
+    restart(dest)
 
 
 @task
 def release(version, env_rebuild=False):
-    """Release: Update version, deploy and push to GitHub master"""
+    """Release: Update version, deploy and push to GitHub master
+    """
     print green('Current version is {0}'.format(current_project_version))
     if not console.confirm('Are you sure you want to release version {0}?'.format(version)):
         return
@@ -231,9 +230,68 @@ def release(version, env_rebuild=False):
           .format(version=version, version_file=version_file)) 
     _msg('git tagging with version number')
     local("git tag -a '{0}'".format(version))
-    _deploy_prod(env_rebuild, False)
-    _msg('pushing master to github')
-    local('git push {github_repo} master'.format(**env.config))
+    deploy('prod', env_rebuild, False)
+    _msg('pushing master and tag to github')
+    repo = env.config.github_repo
+    local('git push {0} master'.format(repo))
+    local('git push {0} {1}'.format(repo, version))
+
+
+@task
+def rollback(version=None, restore_db='ask', restore_media='ask', backup='latest'):
+    """Roll back to previous version (git tag) or a specific one if stated
+
+    Argument 'backup' can be YYMMDD-hhmm (must exist) if latest will not work.
+    """
+    # Most of this is copied from deploy, sometimes with small modifications
+    if not version:
+        # List tags and get second last line
+        version = local("git tag -l | sed -n '$! h; $ {g; p}' |  tr -d '\\n'", capture=True)
+    print green('Current version is {0}'.format(current_project_version))
+    if not console.confirm('Are you sure you want to roll back to version {0}?'.format(version),
+                           default=False):
+        return
+    if restore_db == 'ask':
+        restore_db = console.confirm('Restore database?', default=False)
+    if restore_media == 'ask':
+        restore_media = console.confirm('Restore media?', default=False)
+    # Get current branch. We'll change back to it in the last step.
+    branch = local("git branch | grep '\*' | cut -d' ' -f2", capture=True)
+    # Check out tag, also locally for generating settings and static
+    _msg('checking out the specified branch')
+    local('git checkout {0}'.format(version))
+    with cd(env.config.paths.host_git):
+        run('export GIT_WORK_TREE={paths.prod.git}; git checkout {version} -f'
+            .format(version=version, **env.config))
+    # Force rebuild of environment
+    with cd(env.config.paths.prod.git):
+        _msg('removing old environment')
+        run('rm -rf {paths.prod.env}'.format(**env.config))
+        _msg('creating environment')
+        run('./rebuild_env.sh {paths.prod.env}'.format(**env.config))
+    # Generate and upload settings files
+    build_settings('prod')
+    # Compile messages
+    with cd(env.config.paths.prod.project):
+        run('../manage.py compilemessages')
+    # Restore from backup db and media. 
+    if restore_db:
+        with cd(env.config.paths.prod.git), _env('prod'):
+            run('zcat {paths.backup_db_latest} | ./manage.py dbshellnp'.format(**env.config))
+    if restore_media:
+        print red('Media restore not implemented!') # TODO; better fix the path in the tarball first
+    # We don't need to update db afterwards because it was made in the previous version.
+    # Build and upload static files
+    build_static()
+    _msg('syncing static')
+    project.rsync_project(local_dir=env.config.paths.local.static+'/',
+                          remote_dir=env.config.paths.prod.static+'/',
+                          delete=True,
+                          exclude='/.gitignore')
+    # Restart apache
+    restart('prod')
+    # Change back to the branch used
+    local('git checkout {0}'.format(branch))
 
 
 @task
@@ -313,15 +371,14 @@ def sync_media_with_prod():
                           exclude='/.gitignore')
 
 
-
 @task
 def build_translation():
     # http://blog.brendel.com/2010/09/how-to-customize-djangos-default.html
-    chdir(env.config.default['project'])
+    chdir(env.config.paths.local.project)
     _msg('translating all messages')
     management.call_command('makemessages', all=True)
     _msg('Removing commented-out manual messages')
-    local(r"find locale -name 'django.po' -exec sed s/^\#\~\ // -i {{}} \;")
+    local(r"find locale -name 'django.po' -exec sed s/^\#\~\ // -i {} \;")
     _msg('Compiling messages')
     management.call_command('compilemessages')
 

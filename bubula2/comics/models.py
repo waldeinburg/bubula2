@@ -10,6 +10,7 @@ import comics.specials
 class Comic(TranslatableModel):
     TYPE_CHOICES = []
     # publication default: tomorrow at 6 AM
+    # FIXME: this code is run when server is started, not each time admin is loaded. Therefore it does not work.
     dateTime = models.DateTimeField('Publication time', default=datetime.combine( date.today() + timedelta(1), time(6) ))
     
     translations = TranslatedFields(
@@ -59,7 +60,16 @@ class ComicTypeModel(models.Model):
 
 
 
-# django-hvad does not support abstract classes
+class ComicInfo(TranslatableModel):
+    comic = models.OneToOneField(Comic, related_name='info')
+    
+    translations = TranslatedFields(
+        content = models.TextField()
+    )
+
+
+
+# django-hvad does not support abstract classes; this way we can "inherit" common fields anyway
 class StandardComicTranslatedFields(TranslatedFields):
     def __init__(self, **fields):
         super(StandardComicTranslatedFields, self).__init__(

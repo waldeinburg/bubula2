@@ -2,9 +2,9 @@
 # Backup db and media. Not implemented in Fabric because we do not
 # intend to install Fabric on the host but want to run it as a cron job.
 
-source backup_settings.inc.sh
+source backup_settings.inc.sh || exit 1
 
-source "$ENV/bin/activate"
+source "$ENV/bin/activate" || exit 1
 
 TIME=$(date +%y%m%d-%H%M)
 BACKUP_DB_FILENAME="bubula2-db-$TIME.sql.gz"
