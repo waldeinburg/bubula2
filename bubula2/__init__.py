@@ -4,4 +4,4 @@ from sys import path
 path.append(dirname(__file__))
 
 # The following value is updated automatically by deployment script
-version = '0.1'
+version = '0.3'
