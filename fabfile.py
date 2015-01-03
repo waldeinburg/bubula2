@@ -221,20 +221,27 @@ def release(version, env_rebuild=False):
     print green('Current version is {0}'.format(current_project_version))
     if not console.confirm('Are you sure you want to release version {0}?'.format(version)):
         return
-    local('git checkout master')
-    _msg('updating version number')
+    _msg('updating version number on develop branch')
+    local('git checkout develop')
     version_file = '{project}/__init__.py'.format(**env.config)
     local("sed -ri \"s/^version = .*/version = '{version}'/\" {version_file}"
           .format(version=version, version_file=version_file)) 
     local("git commit {version_file} -m 'Updated version to {version}.'"
           .format(version=version, version_file=version_file)) 
-    _msg('git tagging with version number')
+    _msg('switching to master branch')
+    local('git checkout master')
+    _msg('merge updated version file')
+    local('git cherry-pick develop')
+    _msg('create git tag with version number')
     local("git tag -a '{0}'".format(version))
+    # Now deploy.
     deploy('prod', env_rebuild, False)
-    _msg('pushing master and tag to github')
+    # Deployment done. Also make the result public on GitHub.
+    _msg('pushing master branch and new tag to GitHub')
     repo = env.config.github_repo
     local('git push {0} master'.format(repo))
     local('git push {0} {1}'.format(repo, version))
+    print green('Released version {0}! Currently on master branch.'.format(version))
 
 
 @task
