@@ -1,2 +1,9 @@
+# Jekyll
+.jekyll-metadata
 _site
 .sass-cache
+
+# Dev
+.project
+*.swp
+*~
