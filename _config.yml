@@ -1,14 +1,65 @@
 # Site settings
-title: Your awesome title
-email: your-email@domain.com
-description: > # this means to ignore newlines until "baseurl:"
-  Write an awesome description for your new site here. You can edit this
-  line in _config.yml. It will appear in your document head meta (for
-  Google search results) and in your feed.xml site description.
-baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://yourdomain.com" # the base hostname & protocol for your site
-twitter_username: jekyllrb
-github_username:  jekyll
+email: waldeinburg@bubula2.com
+url: "http://bubula2.com"
+static_url:
+permalink: /:categories/:slug/
+
+# Meta data
+author: Daniel Lundsgaard Skovenborg 
+
+# Common constants
+title:
+  real: 𝔅𝔲𝔟𝔲𝔩𝔞²
+  easy: Bubula²
 
 # Build settings
 markdown: kramdown
+
+# Language list for building menu
+languages:
+  -
+    short: da
+    comics: striber
+    full: dansk
+  -
+    short: en
+    comics: comics
+    full: English
+
+# Defaults
+defaults:
+  -
+    scope:
+      type: posts
+    values:
+      is_comic: true
+      layout: comic
+  -
+    scope:
+      type: pages
+    values:
+      layout: page
+  -
+    scope:
+      path: da
+    values:
+      lang: da
+      comics_url_path: /da/striber/
+  -
+    scope:
+      path: en
+    values:
+      lang: en
+      comics_url_path: /en/comics/
+  -
+    scope:
+      path: da
+      type: posts
+    values:
+      category: striber
+  -
+    scope:
+      path: en
+      type: posts
+    values:
+      category: comics

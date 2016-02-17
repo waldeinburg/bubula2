@@ -1,4 +1,5 @@
 ---
+layout: null
 ---
 ErrorDocument 500 /500.html
 ErrorDocument 404 /404.html
