@@ -13,6 +13,9 @@ title:
   real: 𝔅𝔲𝔟𝔲𝔩𝔞²
   easy: Bubula²
 
+include:
+  - comics
+
 # Build settings
 markdown: kramdown
 
