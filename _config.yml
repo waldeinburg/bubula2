@@ -1,11 +1,12 @@
 # Site settings
 email: waldeinburg@bubula2.com
-url: "http://bubula2.com"
+url: http://bubula2.com
 static_url:
 permalink: /:categories/:slug/
 
 # Meta data
 author: Daniel Lundsgaard Skovenborg 
+artist: Waldeinburg
 
 # Common constants
 title:

@@ -33,16 +33,19 @@
 
     <div id="upper">
       <div id="mainMenuCnt">
-        <nav id="mainMenu"><ul class="menu">{ % show_menu %}</ul></nav>
+        <nav id="mainMenu">
+          {% capture _menu_url %}/{{ page.lang }}/{% endcapture %}
+          {% include automenu url=_menu_url sort="weight" reverse=false all=false %}
+        </nav>
       </div>
 
       <div id="titleCnt">
         <div id="titleAndAuthor">
           <h1 title="{{ site.data.tr.title_trans[page.lang] }}">
-            <a href="/"><img src="{{ site.static_url }}img/title.png" alt="𝔅𝔲𝔟𝔲𝔩𝔞²"/></a>
+            <a href="/"><img src="{{ site.static_url }}/img/title.png" alt="𝔅𝔲𝔟𝔲𝔩𝔞²"/></a>
           </h1>
           <div id="author">
-            {{ site.data.tr.by[page.lang] | capitalize }} <span title="{{ site.author }}">Waldeinburg</span>
+            {{ site.data.tr.by[page.lang] | capitalize }} <span title="{{ site.author }}">{{ site.artist }}</span>
           </div>
         </div>      
         <div id="subtitle">
@@ -81,7 +84,7 @@
         <ul id="langMenu" class="menu">
           {% for lang in site.languages %}
             <li>
-              <a href="/{{ lang.short }}/{% if page.is_comic %}{{ lang.comics }}/{% endif %}{% if page.slug_foreign[lang.short] == null %}{{ page.slug }}{% else %}{{ page.slug_foreign[lang.short] }}{% endif %}/"
+              <a href="{% if lang.short == page.lang %}{{ page.url }}{% else %}{% if page.is_comic %}/{{ lang.short }}/{{ lang.comics }}/{{ page.slug }}/{% else %}{{ page.permalink_foreign }}{% endif %}{% endif %}"
                  title="{{ lang.full | capitalize }}"
                  class="{% if page.lang == lang.short %}current {% endif %}ir ir-base-flag-{{ lang.short }}">
                 {{ lang.full | capitalize }}
@@ -99,14 +102,26 @@
 
     <div id="footer">
       <div id="copyright">
-        { contentblock "copyright" }
+
+      <p>
+        <a rel="license" href="{{ site.data.tr.license_url[page.lang] }}">
+          <img alt="{{ page.data.tr.license[page.lang] }}" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-nd/3.0/88x31.png" />
+        </a>
+        <span property="title">𝔅𝔲𝔟𝔲𝔩𝔞²</span> {{ site.data.tr.by[page.lang] }}
+        <a href="{{ site.url }}" property="attributionName">{{ site.author }} ({{ site.artist }})</a>
+        {{ site.data.tr.is_licensed_under[page.lang] }}
+        <a rel="license" href="{{ site.data.tr.license_url[page.lang] }}">{{ site.data.tr.license_name[page.lang] }}</a>.
+      </p>
+      <p style="clear:both">{{ site.data.tr.license_add[page.lang] }}</p>
+ 
       </div>
       <div id="tech">
         <p>Powered by <a href="http://jekyllrb.com">Jekyll</a>! … and some mod_rewrite</p>
         <p id="source"><a href="https://github.com/waldeinburg/bubula2/">GitHub</a></p>
       </div>
       <div id="contact">
-        {{ site.data.tr.contact[page.lang] | capitalize }}: { % mailto waldeinburg@bubula2.com %}
+        {{ site.data.tr.contact[page.lang] | capitalize }}:
+        <span title="Email" class="postbud"><span class="p-u">waldeinburg</span><span class="transmogrifyAffenschwanz"></span><span class="p-s">bubula2</span><span class="transmogrifyDaDot"></span><span class="p-t">com</span></span>
       </div>
     </div>
 

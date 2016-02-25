@@ -17,3 +17,21 @@ updating:
 subscribe:
   da: abonner
   en: subscribe
+contact:
+  da: kontakt
+  en: contact
+license_title:
+  da: Creative Commons Licens
+  en: Creative Commons License
+is_licensed_under:
+  da: er licenseret under en
+  en: is licensed under a
+license_add:
+  da: Men jeg vil blive glad for at høre det, hvis du bruger min tegneserie!
+  en: But I would love to hear if you use my comic!
+license_name:
+  da: Creative Commons Navngivelse-IkkeKommerciel-IngenBearbejdelse 3.0 Unported Licens
+  en: Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License
+license_url:
+  da: http://creativecommons.org/licenses/by-nc-nd/3.0/deed.da
+  en: http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US
