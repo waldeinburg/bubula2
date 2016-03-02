@@ -1,4 +1,7 @@
 # Translations
+comics:
+  da: striber
+  en: comics
 by:
   da: af
   en: by
@@ -35,3 +38,24 @@ license_name:
 license_url:
   da: http://creativecommons.org/licenses/by-nc-nd/3.0/deed.da
   en: http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US
+comic:
+  da: stribe
+  en: comic
+select:
+  da: vælg
+  en: select
+first:
+  da: første
+  en: first
+previous:
+  da: forrige
+  en: previous
+next:
+  da: næste
+  en: next
+latest:
+  da: seneste
+  en: latest
+random:
+  da: tilfældig
+  en: random

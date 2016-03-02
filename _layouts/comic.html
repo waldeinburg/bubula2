@@ -1,4 +1,122 @@
 ---
 layout: base
+js_lib:
+  - //ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.js
+js:
+  - dropdown.js
+  - comic.js
+css:
+  - dropdown.css
+  - comic.css
+  - comic-ir-sprites.css
+js_prod: comic-pack.min.js
+css_prod: comic-pack.min.css
 ---
-{{ content }}
+<script>
+  comicId = {{ page.slug }};
+  comicUrl = '{{ site.url }}{{ page.url }}';
+  comicsUrlPath = '{{ page.comics_url_path }}';
+  comicTitle = '{{ page.title | replace:'\':'\\' | replace:"'","\'" }}';
+</script>
+
+<ul id="comic-dateMenu" class="menu small">
+  {% assign _comic = site.data.tr.comic[page.lang] %}
+  {% if page.slug != site.posts.last.slug %}
+    <li>
+      <a href="{{ page.comics_url_path }}{{ site.posts.last.slug }}/"
+         title="{{ site.data.tr.first[page.lang] | capitalize }} {{ _comic }}"
+         class="ir ir-comics-first-small">{{ site.data.tr.first[page.lang] | capitalize }} {{ _comic }}</a>
+    </li>
+    <li>
+      <a href="{{ page.comics_url_path }}{{ page.slug | minus:1 }}/"
+         title="{{ site.data.tr.previous[page.lang] | capitalize }} {{ _comic }}"
+         class="ir ir-comics-prev-small">{{ site.data.tr.previous[page.lang] | capitalize }} {{ _comic }}</a>
+    </li>
+  {% else %}
+    <li><span class="ir ir-comics-first-small disabledLink"></span></li>
+    <li><span class="ir ir-comics-prev-small disabledLink"></span></li>
+  {% endif %}
+
+  <li id="comic-date">
+    <a href="#"
+       onclick="this.blur(); return false;"
+       title="{{ site.data.tr.select[page.lang] | capitalize }} {{ _comic }}">{{ page.date | date:"%d-%m-%Y" }}</a>
+  </li>
+
+  {% if page.slug != site.posts.first.slug %}
+    <li>
+      <a href="{{ page.comics_url_path }}{{ page.slug | plus:1 }}/"
+         title="{{ site.data.tr.next[page.lang] | capitalize }} {{ _comic }}"
+         class="ir ir-comics-next-small">{{ site.data.tr.next[page.lang] | capitalize }} {{ _comic }}</a>
+    </li>
+    <li>
+      <a href="{{ page.comics_url_path }}{{ site.posts.first.slug }}/"
+         title="{{ site.data.tr.latest[page.lang] | capitalize }} {{ _comic }}"
+         class="ir ir-comics-latest-small">{{ site.data.tr.latest[page.lang] | capitalize }} {{ _comic }}</a>
+    </li>
+  {% else %}
+    <li><span class="ir ir-comics-next-small disabledLink"></span></li>
+    <li><span class="ir ir-comics-latest-small disabledLink"></span></li>
+  {% endif %}
+</ul>
+
+{% if content %}
+  <div id="intro">{{ content }}</div>
+{% endif %}
+
+<div id="comic">
+  <a href="#comic">
+    <img src="{{ site.media_url }}/comics/{{ page.img }}"
+         alt=""
+         title="{{ page.text | xml_escape }}"/>
+  </a>
+</div>
+
+<div id="permalink" class="small">
+  Permalink: <a href="{{ site.url }}{{ page.url }}">{{ site.url }}{{ page.url }}</a>
+</div>
+
+<nav>
+  <ul id="comic-navMenu" class="menu">
+    {% if page.slug != site.posts.last.slug %}
+      <li>
+        <a href="{{ page.comics_url_path }}{{ site.posts.last.slug }}/"
+           title="{{ site.data.tr.first[page.lang] | capitalize }} {{ _comic }}"
+           class="ir ir-comics-first-big">{{ site.data.tr.first[page.lang] | capitalize }} {{ _comic }}</a>
+      </li>
+      <li>
+        <a href="{{ page.comics_url_path }}{{ page.slug | minus:1 }}/"
+           title="{{ site.data.tr.previous[page.lang] | capitalize }} {{ _comic }}"
+           class="ir ir-comics-prev-big">{{ site.data.tr.previous[page.lang] | capitalize }} {{ _comic }}</a>
+      </li>
+    {% else %}
+      <li><span class="ir ir-comics-first-big disabledLink"></span></li>
+      <li><span class="ir ir-comics-prev-big disabledLink"></span></li>
+    {% endif %}
+
+    <li>
+      <a href="#"
+         onclick="this.blur(); return false;"
+         title="{{ site.data.tr.random[page.lang] }} {{ _comic }}"
+         class="ir ir-comics-random-big">{{ site.data.tr.random[page.lang] }} {{ _comic }}</a>
+    </li>
+
+    {% if page.slug != site.posts.first.slug %}
+      <li>
+        <a href="{{ page.comics_url_path }}{{ page.slug | plus:1 }}/"
+           title="{{ site.data.tr.next[page.lang] | capitalize }} {{ _comic }}"
+           class="ir ir-comics-next-big">{{ site.data.tr.next[page.lang] | capitalize }} {{ _comic }}</a>
+      </li>
+      <li>
+        <a href="{{ page.comics_url_path }}{{ site.posts.first.slug }}/"
+           title="{{ site.data.tr.latest[page.lang] | capitalize }} {{ _comic }}"
+           class="ir ir-comics-latest-big">{{ site.data.tr.latest[page.lang] | capitalize }} {{ _comic }}</a>
+      </li>
+    {% else %}
+      <li><span class="ir ir-comics-next-big disabledLink"></span></li>
+      <li><span class="ir ir-comics-latest-big disabledLink"></span></li>
+    {% endif %}
+  </ul>
+</nav>
+
+<div id="ohnorobot"></div>

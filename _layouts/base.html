@@ -10,10 +10,16 @@
     <meta name="viewport" content="width=device-width"/>
     {% if jekyll.environment == "TODO-production" %}
       <link href="{{ site.static_url }}/css/pack.min.css" rel="stylesheet" media="all"/>
+      {% if layout.css_proc %}
+        <link href="{{ site.static_url }}/css/{{ layout.css_prod }}" rel="stylesheet" media="all"/>
+      {% endif %}
     {% else %}
       <link href="{{ site.static_url }}/css/normalize.css" rel="stylesheet" media="all"/>
       <link href="{{ site.static_url }}/css/main.css" rel="stylesheet" media="all"/>
       <link href="{{ site.static_url }}/css/ir-sprites.css" rel="stylesheet" media="all"/>
+      {% for src in layout.css %}
+        <link href="{{ site.static_url }}/css/{{ src }}" rel="stylesheet" media="all"/>
+      {% endfor %}
     {% endif %}
     {% if jekyll.environment == "production" %}
       <script>
@@ -84,7 +90,7 @@
         <ul id="langMenu" class="menu">
           {% for lang in site.languages %}
             <li>
-              <a href="{% if lang.short == page.lang %}{{ page.url }}{% else %}{% if page.is_comic %}/{{ lang.short }}/{{ lang.comics }}/{{ page.slug }}/{% else %}{{ page.permalink_foreign }}{% endif %}{% endif %}"
+              <a href="{% if lang.short == page.lang %}{{ page.url }}{% else %}{% if page.is_comic %}/{{ lang.short }}/{{ site.data.tr.comics[lang.short] }}/{{ page.slug }}/{% else %}{{ page.permalink_foreign }}{% endif %}{% endif %}"
                  title="{{ lang.full | capitalize }}"
                  class="{% if page.lang == lang.short %}current {% endif %}ir ir-base-flag-{{ lang.short }}">
                 {{ lang.full | capitalize }}
@@ -129,9 +135,13 @@
       <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
       <script>window.jQuery || document.write('<script src="{{ site.static_url }}/js/vendor/jquery-1.8.2.min.js"><\/script>')</script>
       <script src="{{ site.static_url }}/js/pack.min.js"></script>
+      {% for src in layout.js_lib %}<script src="{{ src }}"></script>{% endfor %}
+      {% if layout.js_prod %}<script src="{{ site.static.url }}/js/{{ layout.js_prod }}"></script>{% endif %}
     {% else %}
       <script src="{{ site.static_url }}/js/vendor/jquery-1.8.2.js"></script>
       <script src="{{ site.static_url }}/js/main.js"></script>
+      {% for src in layout.js_lib %}<script src="{{ src }}"></script>{% endfor %}
+      {% for src in layout.js %}<script src="{{ site.static_url }}/js/{{ src }}"></script>{% endfor %}
     {% endif %}
   </body>
 </html>

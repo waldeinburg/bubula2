@@ -25,11 +25,9 @@ markdown: kramdown
 languages:
   -
     short: da
-    comics: striber
     full: dansk
   -
     short: en
-    comics: comics
     full: English
 
 # Defaults
