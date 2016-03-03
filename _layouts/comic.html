@@ -13,10 +13,12 @@ js_prod: comic-pack.min.js
 css_prod: comic-pack.min.css
 ---
 <script>
-  comicId = {{ page.slug }};
-  comicUrl = '{{ site.url }}{{ page.url }}';
-  comicsUrlPath = '{{ page.comics_url_path }}';
-  comicTitle = '{{ page.title | replace:'\':'\\' | replace:"'","\'" }}';
+  comic = {};
+  comic.lang = '{{ page.lang }}';
+  comic.id = {{ page.slug }};
+  comic.url = '{{ site.url }}{{ page.url }}';
+  comic.comicsUrlPath = '{{ page.comics_url_path }}';
+  comic.title = '{{ page.title | replace:'\':'\\' | replace:"'","\'" }}';
 </script>
 
 <ul id="comic-dateMenu" class="menu small">
