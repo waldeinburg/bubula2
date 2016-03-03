@@ -51,6 +51,10 @@
             return false;
         });
     
+    $('.random-comic').click(function() {
+        var id = Math.floor(Math.random() * comic.latestId) + 1;
+        window.location = comic.comicsUrlPath + id + '/';
+    });
     
     /*
      * Oh No Robot loader

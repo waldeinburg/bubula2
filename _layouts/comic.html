@@ -19,6 +19,7 @@ css_prod: comic-pack.min.css
   comic.url = '{{ site.url }}{{ page.url }}';
   comic.comicsUrlPath = '{{ page.comics_url_path }}';
   comic.title = '{{ page.title | replace:'\':'\\' | replace:"'","\'" }}';
+  comic.latestId = {{ site.posts.first.slug }};
 </script>
 
 <ul id="comic-dateMenu" class="menu small">
@@ -99,8 +100,8 @@ css_prod: comic-pack.min.css
     <li>
       <a href="#"
          onclick="this.blur(); return false;"
-         title="{{ site.data.tr.random[page.lang] }} {{ _comic }}"
-         class="ir ir-comics-random-big">{{ site.data.tr.random[page.lang] }} {{ _comic }}</a>
+         title="{{ site.data.tr.random[page.lang] | capitalize }} {{ _comic }}"
+         class="random-comic ir ir-comics-random-big">{{ site.data.tr.random[page.lang] }} {{ _comic }}</a>
     </li>
 
     {% if page.slug != site.posts.first.slug %}
