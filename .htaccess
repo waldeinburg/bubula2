@@ -33,3 +33,9 @@ RewriteCond %{ENV:LANG} da
 RewriteRule ^[0-9]+/$ /da/{{ site.data.tr.comics["da"] }}/$0 [R=307,L]
 RewriteCond %{ENV:LANG} en
 RewriteRule ^[0-9]+/$ /en/{{ site.data.tr.comics["en"] }}/$0 [R=307,L]
+
+# Redirect easier url. We cannot do it via the following permalink rules
+# because we want the code to be 301, not 307. The chosen language url
+# is constant while permalink is a link to the comic independent of language.
+RewriteRule ^da/([0-9]+)/$ /da/{{ site.data.tr.comics["da"] }}/$1/ [R=301,L]
+RewriteRule ^en/([0-9]+)/$ /en/{{ site.data.tr.comics["en"] }}/$1/ [R=301,L]
