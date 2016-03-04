@@ -25,6 +25,11 @@ RewriteRule ^(da|en)/.*$ - [E=LANG:$1,CO=language:$1:bubula2.com:525600]
 
 # Root redirects to latest comic.
 RewriteRule ^$ /%{ENV:LANG}/
-RewriteRule ^da/$ /da/striber/{{ site.posts.first.slug }}/ [L]
-RewriteRule ^en/$ /en/comics/{{ site.posts.first.slug }}/ [L]
+RewriteRule ^da/$ /da/{{ site.data.tr.comics["da"] }}/{{ site.posts.first.slug }}/ [L]
+RewriteRule ^en/$ /en/{{ site.data.tr.comics["en"] }}/{{ site.posts.first.slug }}/ [L]
 
+# Permalink (/<id>/) redirects to current language.
+RewriteCond %{ENV:LANG} da
+RewriteRule ^[0-9]+/$ /da/{{ site.data.tr.comics["da"] }}/$0 [R=307,L]
+RewriteCond %{ENV:LANG} en
+RewriteRule ^[0-9]+/$ /en/{{ site.data.tr.comics["en"] }}/$0 [R=307,L]

@@ -14,6 +14,7 @@ title:
   easy: Bubula²
 
 include:
+  - .htaccess
   - comics
 exclude:
   - README.md
