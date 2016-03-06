@@ -15,7 +15,7 @@ title:
 
 include:
   - .htaccess
-  - comics
+  - bilder
 exclude:
   - README.md
 

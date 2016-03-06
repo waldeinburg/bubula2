@@ -39,3 +39,7 @@ RewriteRule ^[0-9]+/$ /en/{{ site.data.tr.comics["en"] }}/$0 [R=307,L]
 # is constant while permalink is a link to the comic independent of language.
 RewriteRule ^da/([0-9]+)/$ /da/{{ site.data.tr.comics["da"] }}/$1/ [R=301,L]
 RewriteRule ^en/([0-9]+)/$ /en/{{ site.data.tr.comics["en"] }}/$1/ [R=301,L]
+
+# Redirect to language based on language of the "comics" part.
+RewriteRule ^striber/.*$ /da/$0 [R=301,L]
+RewriteRule ^comics/.*$ /en/$0 [R=301,L]
