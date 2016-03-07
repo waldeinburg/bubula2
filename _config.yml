@@ -17,6 +17,9 @@ comics_img_path: /bilder/
 # stadig virke. Derfor kan vi ikke bruge {{ site.url | prepend:media_url }}.
 full_media_url: http://bubula2.com
 
+# Feed limit. Multiply by 2 as the for loop will get both languages.
+feed_limit: 10
+
 include:
   - .htaccess
   - bilder

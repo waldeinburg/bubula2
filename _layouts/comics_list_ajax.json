@@ -1,5 +1,3 @@
----
----
 {"comics": [
   {% for post in site.posts %}
     {% if post.lang == page.lang %}

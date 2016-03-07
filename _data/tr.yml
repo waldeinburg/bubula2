@@ -44,6 +44,9 @@ feed_title:
 feed_description:
   da: Seneste striber i web-tegneserien Bubula².
   en: Latest comic of the Bubula² webcomic.
+permalink_text:
+  da: Sprogneutralt permalink
+  en: Language independent permalink
 comic:
   da: stribe
   en: comic
