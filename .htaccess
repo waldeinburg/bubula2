@@ -29,11 +29,11 @@ RewriteRule ^$ /%{ENV:LANG}/
 RewriteRule ^da/$ /da/{{ site.data.tr.comics["da"] }}/{{ site.posts.first.slug }}/ [L]
 RewriteRule ^en/$ /en/{{ site.data.tr.comics["en"] }}/{{ site.posts.first.slug }}/ [L]
 
-# Permalink (/<id>/) redirects to current language.
+# Permalink (/<id>/) shows current language.
 RewriteCond %{ENV:LANG} da
-RewriteRule ^[0-9]+/$ /da/{{ site.data.tr.comics["da"] }}/$0 [R=307,L]
+RewriteRule ^[0-9]+/$ /da/{{ site.data.tr.comics["da"] }}/$0 [L]
 RewriteCond %{ENV:LANG} en
-RewriteRule ^[0-9]+/$ /en/{{ site.data.tr.comics["en"] }}/$0 [R=307,L]
+RewriteRule ^[0-9]+/$ /en/{{ site.data.tr.comics["en"] }}/$0 [L]
 
 # Redirect easier url. We cannot do it via the following permalink rules
 # because we want the code to be 301, not 307. The chosen language url
