@@ -71,7 +71,7 @@ css_prod: comic-pack.min.css
   <a href="#comic">
     <img src="{{ page.img | prepend:site.comics_img_path | prepend:site.media_url }}"
          alt=""
-         title="{{ page.text | xml_escape }}"/>
+         title="{{ page.text | smartify | xml_escape }}"/>
   </a>
 </div>
 
