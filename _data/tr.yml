@@ -38,6 +38,12 @@ license_name:
 license_url:
   da: http://creativecommons.org/licenses/by-nc-nd/3.0/deed.da
   en: http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US
+feed_title:
+  da: Bubula² seneste striber
+  en: Bubula² latest comics
+feed_description:
+  da: Seneste striber i web-tegneserien Bubula².
+  en: Latest comic of the Bubula² webcomic.
 comic:
   da: stribe
   en: comic

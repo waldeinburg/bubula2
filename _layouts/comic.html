@@ -69,7 +69,7 @@ css_prod: comic-pack.min.css
 
 <div id="comic">
   <a href="#comic">
-    <img src="{{ site.media_url }}/comics/{{ page.img }}"
+    <img src="{{ page.img | prepend:site.comics_img_path | prepend:site.media_url }}"
          alt=""
          title="{{ page.text | xml_escape }}"/>
   </a>

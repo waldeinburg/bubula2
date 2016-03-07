@@ -12,6 +12,10 @@ artist: Waldeinburg
 title:
   real: 𝔅𝔲𝔟𝔲𝔩𝔞²
   easy: Bubula²
+comics_img_path: /bilder/
+# Hvis vi en dag bruger media_url og denne f.eks. er på Amazon, skal feeds
+# stadig virke. Derfor kan vi ikke bruge {{ site.url | prepend:media_url }}.
+full_media_url: http://bubula2.com
 
 include:
   - .htaccess

@@ -108,7 +108,9 @@
 
     <div id="footer">
       <div id="copyright">
-
+      <p>
+        Copyright © {{ site.posts.last.date | date:"%Y" }}-{{ site.time | date:"%Y" }} {{ site.author }} ({{ site.artist }}):
+      </p>
       <p>
         <a rel="license" href="{{ site.data.tr.license_url[page.lang] }}">
           <img alt="{{ page.data.tr.license[page.lang] }}" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-nd/3.0/88x31.png" />
