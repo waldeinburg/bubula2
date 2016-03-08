@@ -47,7 +47,7 @@
 
       <div id="titleCnt">
         <div id="titleAndAuthor">
-          <h1 title="{{ site.data.tr.title_trans[page.lang] }}">
+          <h1 title="{{ site.data.tr.title_trans[page.lang] | smartify | xml_escape }}">
             <a href="/"><img src="{{ site.static_url }}/img/title.png" alt="𝔅𝔲𝔟𝔲𝔩𝔞²"/></a>
           </h1>
           <div id="author">

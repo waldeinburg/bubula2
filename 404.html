@@ -17,7 +17,9 @@ permalink: /404.html
     <div id="upper">
       <div id="titleCnt">
         <div id="titleAndAuthor">
-          <h1 title="Latein, &quot;Heul wie eine Eule, Rindfleisch&quot; (vorausgesetzt, daß Bubula=2)" href="/"><img src="/img/title.png" alt="{{ site.title.real }}"/></a></h1>
+          <h1 title="{{ 'Latein, "Heul wie eine Eule, Rindfleisch" (vorausgesetzt, daß Bubula=2)' | smartify | xml_escape }}">
+            <a href="/"><img src="/img/title.png" alt="{{ site.title.real }}"/></a>
+          </h1>
           <div id="author">By <span title="Daniel Lundsgaard Skovenborg">Waldeinburg</span></div>
         </div>
       </div>
