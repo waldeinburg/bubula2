@@ -24,7 +24,7 @@ include:
   - .htaccess
   - bilder
 exclude:
-  - build.sh
+  - build.pl
   - README.md
 
 # Build settings
