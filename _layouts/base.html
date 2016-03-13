@@ -10,7 +10,7 @@
     <meta name="viewport" content="width=device-width"/>
     {% if jekyll.environment == "production" %}
       <link href="{{ site.static_url }}/css/pack.min.css" rel="stylesheet" media="all"/>
-      {% if layout.css_proc %}
+      {% if layout.css_prod %}
         <link href="{{ site.static_url }}/css/{{ layout.css_prod }}" rel="stylesheet" media="all"/>
       {% endif %}
     {% else %}
