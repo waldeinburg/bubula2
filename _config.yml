@@ -22,10 +22,11 @@ feed_limit: 10
 
 include:
   - .htaccess
-  - bilder
+  - /bilder
 exclude:
-  - build.pl
-  - README.md
+  - /vendor
+  - /build.pl
+  - /README.md
 
 # Build settings
 markdown: kramdown

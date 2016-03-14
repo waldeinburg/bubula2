@@ -47,7 +47,7 @@ unless ($nobuild) {
     print "Building ...\n";
 
     $ENV{'JEKYLL_ENV'} = 'production';
-    system('bundle', 'exec', 'jekyll', 'build');
+    system('bundle', 'exec', 'jekyll', 'build') && die("Build error!");
 }
 
 unless ($nominify) {
@@ -76,7 +76,7 @@ unless ($nobundle) {
     print "Bundling and minifying JS and CSS ...\n";
 
     local $/;
-    chdir('_site');
+    chdir('_site') || die("Could not switch to _site");
 
     for my $pack (keys %bundle_and_minify) {
         my($name, $dir, $suffix) = fileparse($pack, qr/\.[^.]+/);
@@ -92,9 +92,8 @@ unless ($nobundle) {
         }
         close(P);
 
-        system('java', '-jar', YUICOMPRESSOR, '-v', '-o', $minpack, '--charset', 'utf-8', $pack);
-        # Return value always seems to indicate fail
-        #     || die("Failed execute: $!");
+        system('java', '-jar', YUICOMPRESSOR, '-v', '-o', $minpack, '--charset', 'utf-8', $pack)
+            && die("Failed execute: $!");
         unlink($pack) unless $keeporigs;
     }
 }
