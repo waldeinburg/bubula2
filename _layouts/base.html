@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8"/>
+    <title>Bubula² : {{ page.title }}</title>
+    <meta name="author" content="{{ site.author }}"/>
+    <meta name="description" content="{{ site.data.tr.description[page.lang] }}"/>
+    <meta name="keywords" content="{{ site.data.tr.keywords[page.lang] }}"/>
+    <link rel="shortcut icon" href="{{ site.static_url }}/img/favicon.ico"/>
+    <meta name="viewport" content="width=device-width"/>
+    {% if jekyll.environment == "production" %}
+      <link href="{{ site.static_url }}/css/pack.min.css" rel="stylesheet" media="all"/>
+      {% if layout.css_prod %}
+        <link href="{{ site.static_url }}/css/{{ layout.css_prod }}" rel="stylesheet" media="all"/>
+      {% endif %}
+    {% else %}
+      <link href="{{ site.static_url }}/css/normalize.css" rel="stylesheet" media="all"/>
+      <link href="{{ site.static_url }}/css/main.css" rel="stylesheet" media="all"/>
+      <link href="{{ site.static_url }}/css/ir-sprites.css" rel="stylesheet" media="all"/>
+      {% for src in layout.css %}
+        <link href="{{ site.static_url }}/css/{{ src }}" rel="stylesheet" media="all"/>
+      {% endfor %}
+    {% endif %}
+    {% if jekyll.environment == "production" %}
+      <script>
+        var _gaq=[['_setAccount','UA-35577761-1'],['_trackPageview']];
+        (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+        g.src=('https:'==location.protocol?'//ssl':'//www')+'.google-analytics.com/ga.js';
+        s.parentNode.insertBefore(g,s)}(document,'script'));
+      </script>
+    {% endif %}
+  </head>
+  <body>
+    <!--[if lt IE 10]>
+      <p class="chromeframe">
+        You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">activate Google Chrome Frame</a> to improve your experience.
+      </p>
+    <![endif]-->
+
+    <div id="upper">
+      <div id="mainMenuCnt">
+        <nav id="mainMenu">
+          {% capture _menu_url %}/{{ page.lang }}/{% endcapture %}
+          {% include automenu url=_menu_url sort="weight" reverse=false all=false %}
+        </nav>
+      </div>
+
+      <div id="titleCnt">
+        <div id="titleAndAuthor">
+          <h1 title="{{ site.data.tr.title_trans[page.lang] | smartify | xml_escape }}">
+            <a href="/"><img src="{{ site.static_url }}/img/title.png" alt="𝔅𝔲𝔟𝔲𝔩𝔞²"/></a>
+          </h1>
+          <div id="author">
+            {{ site.data.tr.by[page.lang] | capitalize }} <span title="{{ site.author }}">{{ site.artist }}</span>
+          </div>
+        </div>      
+        <div id="subtitle">
+          – {{ page.subtitle }}
+        </div>
+      </div>
+
+      <div id="miscMenuCnt">
+        <div id="getNews">
+          <div id="nextUpdate">{{ site.data.tr.updating[page.lang] }}</div>
+          <ul id="feeds" class="menu">
+            <li>{{ site.data.tr.subscribe[page.lang] | capitalize }}:</li>
+            <li>
+              <a href="{{ page.comics_url_path }}feed/latest/rss/"
+                 title="{{ site.data.tr.subscribe[page.lang] | capitalize }} (RSS)"
+                 class="ir ir-base-rss">
+                {{ site.data.tr.subscribe[page.lang] | capitalize }} (RSS)
+              </a>
+            </li>
+            <li>
+              <a href="{{ page.comics_url_path }}feed/latest/atom/"
+                 title="{{ site.data.tr.subscribe[page.lang] | capitalize }} (Atom)"
+                 class="ir ir-base-atom">
+                {{ site.data.tr.subscribe[page.lang] | capitalize }} (Atom)
+              </a>
+            </li>
+          </ul>
+          <div id="twitter">
+            <a href="https://twitter.com/waldeinburg">
+              <span class="ir ir-base-twitter">Twitter</span>
+              @Waldeinburg
+            </a>
+          </div>
+        </div>
+
+        <ul id="langMenu" class="menu">
+          {% for lang in site.languages %}
+            <li>
+              <a href="{% if lang.short == page.lang %}{{ page.url }}{% else %}{% if page.is_comic %}/{{ lang.short }}/{{ site.data.tr.comics[lang.short] }}/{{ page.slug }}/{% else %}{{ page.permalink_foreign }}{% endif %}{% endif %}"
+                 title="{{ lang.full | capitalize }}"
+                 class="{% if page.lang == lang.short %}current {% endif %}ir ir-base-flag-{{ lang.short }}">
+                {{ lang.full | capitalize }}
+              </a>
+            </li>
+          {% endfor %}
+        </ul>
+      </div>
+    </div>
+
+    <div id="content">
+      <h2>{{ page.title }}</h2>
+      {{ content }}
+    </div>
+
+    <div id="footer">
+      <div id="copyright">
+      <p>
+        Copyright © {{ site.posts.last.date | date:"%Y" }}-{{ site.time | date:"%Y" }} {{ site.author }} ({{ site.artist }}):
+      </p>
+      <p>
+        <a rel="license" href="{{ site.data.tr.license_url[page.lang] }}">
+          <img alt="{{ page.data.tr.license[page.lang] }}" style="border-width:0" src="http://i.creativecommons.org/l/by-nc-nd/3.0/88x31.png" />
+        </a>
+        <span property="title">𝔅𝔲𝔟𝔲𝔩𝔞²</span> {{ site.data.tr.by[page.lang] }}
+        <a href="{{ site.url }}" property="attributionName">{{ site.author }} ({{ site.artist }})</a>
+        {{ site.data.tr.is_licensed_under[page.lang] }}
+        <a rel="license" href="{{ site.data.tr.license_url[page.lang] }}">{{ site.data.tr.license_name[page.lang] }}</a>.
+      </p>
+      <p style="clear:both">{{ site.data.tr.license_add[page.lang] }}</p>
+ 
+      </div>
+      <div id="tech">
+        <p>Powered by <a href="http://jekyllrb.com">Jekyll</a>! … and some mod_rewrite</p>
+        <p id="source"><a href="https://github.com/waldeinburg/bubula2/">GitHub</a></p>
+      </div>
+      <div id="contact">
+        {{ site.data.tr.contact[page.lang] | capitalize }}:
+        <span title="Email" class="postbud"><span class="p-u">waldeinburg</span><span class="transmogrifyAffenschwanz"></span><span class="p-s">bubula2</span><span class="transmogrifyDaDot"></span><span class="p-t">com</span></span>
+      </div>
+    </div>
+
+    {% if jekyll.environment == "production" %}
+      <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+      <script>window.jQuery || document.write('<script src="{{ site.static_url }}/js/vendor/jquery-1.8.2.min.js"><\/script>')</script>
+      <script src="{{ site.static_url }}/js/pack.min.js"></script>
+      {% for src in layout.js_lib %}<script src="{{ src }}"></script>{% endfor %}
+      {% if layout.js_prod %}<script src="{{ site.static.url }}/js/{{ layout.js_prod }}"></script>{% endif %}
+    {% else %}
+      <script src="{{ site.static_url }}/js/vendor/jquery-1.8.2.js"></script>
+      <script src="{{ site.static_url }}/js/main.js"></script>
+      {% for src in layout.js_lib %}<script src="{{ src }}"></script>{% endfor %}
+      {% for src in layout.js %}<script src="{{ site.static_url }}/js/{{ src }}"></script>{% endfor %}
+    {% endif %}
+  </body>
+</html>

@@ -1,0 +1,12 @@
+{"comics": [
+  {% for post in site.posts %}
+    {% if post.lang == page.lang %}
+      {
+        "date": "{{ post.date | date: "%Y-%m-%d" }}",
+        "id": {{ post.slug }},
+        "title": "{{ post.title }}"
+      }
+      {% if post.slug != "1" %},{% endif %}
+    {% endif %}
+  {% endfor %}
+]}

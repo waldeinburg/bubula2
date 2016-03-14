@@ -1,0 +1,80 @@
+.ui-dropdown li.current {
+  font-weight: bold;
+}
+.ui-dropdown dt a {
+  color: #000000;
+  text-decoration: none;
+}
+.ui-dropdown dt a:hover {
+  color: #808080; /* hsl(0, 0%, 50%) */
+}
+.ui-dropdown dd {
+  background: white;
+  max-height: 10em;
+  border: solid 1px;
+  border-top: none;
+}
+.ui-dropdown dd div {
+  padding: 0.2em;
+}
+.ui-dropdown dd li span {
+  padding: 0 0.2em;
+}
+.ui-dropdown dd li span:first-child {
+  padding-left: 0;
+}
+
+#content {
+  min-width: 800px;
+}
+h2 {
+  width: 100%;
+  margin: 0;
+}
+h2, #comic-dateMenu {
+  display: table-cell;
+  padding-bottom: 0.1em;
+}
+
+#comic-dateMenu, #comic-dateMenu li {
+  vertical-align: bottom;
+}
+#comic-date {
+  padding-bottom: 3px;
+  white-space: nowrap;
+}
+
+#comic-navMenu {
+  margin: 0.2em auto 0;
+}
+#comic-navMenu li {
+  padding: 0 1em;
+}
+
+#comic {
+  margin-top: 0.2em;
+  text-align: center;
+}
+
+#permalink {
+  text-align: center;
+  margin-bottom: 1em;
+}
+
+#ohnorobot {
+  margin-top: 2em;
+  text-align: center;
+}
+#ohnorobot a:hover {
+  opacity: 0.5;
+}
+
+@media print {
+  #paypal {
+    display: none !important;
+  }
+  
+  #content {
+    min-width: auto;
+  }
+}

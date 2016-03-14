@@ -1,0 +1,46 @@
+---
+layout: null
+---
+ErrorDocument 500 /500.html
+ErrorDocument 404 /404.html
+DirectoryIndex index.html index.xml
+
+RewriteEngine on
+
+# Trailing slash.
+RewriteCond %{REQUEST_URI} !(/$|\.) 
+RewriteRule (.*) %{REQUEST_URI}/ [R=301,L] 
+
+RewriteRule (.*/)index\.html$ /$1 [R=301,L]
+
+# Default language.
+SetEnvIf Remote_Addr . LANG=en
+# If accepting Danish, use Danish as default.
+SetEnvIf Accept-Language da LANG=da
+# If cookie is set it overrides the default.
+SetEnvIf Cookie language=(da|en) LANG=$1
+
+# Keep last language visited.
+# Final override of language variable.
+RewriteRule ^(da|en)/.*$ - [E=LANG:$1,CO=language:$1:bubula2.com:525600]
+
+# Root redirects to latest comic.
+RewriteRule ^$ /%{ENV:LANG}/
+RewriteRule ^da/$ /da/{{ site.data.tr.comics["da"] }}/{{ site.posts.first.slug }}/ [L]
+RewriteRule ^en/$ /en/{{ site.data.tr.comics["en"] }}/{{ site.posts.first.slug }}/ [L]
+
+# Permalink (/<id>/) shows current language.
+RewriteCond %{ENV:LANG} da
+RewriteRule ^[0-9]+/$ /da/{{ site.data.tr.comics["da"] }}/$0 [L]
+RewriteCond %{ENV:LANG} en
+RewriteRule ^[0-9]+/$ /en/{{ site.data.tr.comics["en"] }}/$0 [L]
+
+# Redirect easier url. We cannot do it via the following permalink rules
+# because we want the code to be 301, not 307. The chosen language url
+# is constant while permalink is a link to the comic independent of language.
+RewriteRule ^da/([0-9]+)/$ /da/{{ site.data.tr.comics["da"] }}/$1/ [R=301,L]
+RewriteRule ^en/([0-9]+)/$ /en/{{ site.data.tr.comics["en"] }}/$1/ [R=301,L]
+
+# Redirect to language based on language of the "comics" part.
+RewriteRule ^striber/.*$ /da/$0 [R=301,L]
+RewriteRule ^comics/.*$ /en/$0 [R=301,L]

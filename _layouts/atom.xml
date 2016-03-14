@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="{{ page.lang }}">
+  <title>{{ site.data.tr.feed_title[page.lang] | xml_escape }}</title>
+  <link href="{{ site.url }}" rel="alternate"/>
+  <id>{{ site.url }}</id>
+  <subtitle>{{ site.data.tr.feed_description[page.lang] | xml_escape }}</subtitle>
+  <link href="{{ page.url | prepend:site.url }}" rel="self"/>
+  <rights>
+    Copyright © {{ site.posts.last.date | date:"%Y" }}-{{ site.time | date:"%Y" }} {{ site.author }} ({{ site.artist }}):
+    {{ site.data.tr.license_name[page.lang] | xml_escape }}
+  </rights>
+  <updated>{{ site.time | date_to_rfc3339 }}</updated>
+  <generator>Jekyll v{{ jekyll.version }}</generator>
+  {% for post in site.posts limit:feed_limit %}
+    {% if post.lang == page.lang %}
+      <entry>
+        <title>{{ post.title | xml_escape }}</title>
+        <link href="{{ post.url | prepend:site.url }}" rel="alternate"/>
+        <summary type="html">
+          &lt;img src="{{ post.img | prepend:site.comics_img_path | prepend:site.full_media_url }}"
+                  alt="{{ post.title | xml_escape | xml_escape }}"
+                  title="{{ post.text | xml_escape | xml_escape }}"/&gt;
+        </summary>
+        <id>{{ post.url | prepend:site.url }}</id>
+        <updated>{{ post.date | date_to_rfc3339 }}</updated>
+      </entry>
+    {% endif %}
+  {% endfor %}
+</feed>

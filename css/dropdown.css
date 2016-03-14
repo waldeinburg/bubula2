@@ -1,0 +1,22 @@
+.ui-dropdown dl, .ui-dropdown dt, .ui-dropdown dd {
+  margin: 0;
+}
+.ui-dropdown dt {
+  cursor: pointer;
+}
+.ui-dropdown dd {
+  position: absolute;
+}
+.ui-dropdown dd ul {
+  display: table;
+  border-collapse: collapse;
+}
+.ui-dropdown dd ul li {
+  display: table-row;
+}
+.ui-dropdown dd ul li span {
+  display: table-cell;
+}
+.ui-dropdown dd ul li span.value {
+  display: none;
+}

@@ -1,0 +1,78 @@
+# Site settings
+email: waldeinburg@bubula2.com
+url: http://bubula2.com
+static_url:
+permalink: /:categories/:slug/
+
+# Meta data
+author: Daniel Lundsgaard Skovenborg 
+artist: Waldeinburg
+
+# Common constants
+title:
+  real: 𝔅𝔲𝔟𝔲𝔩𝔞²
+  easy: Bubula²
+comics_img_path: /bilder/
+# Hvis vi en dag bruger media_url og denne f.eks. er på Amazon, skal feeds
+# stadig virke. Derfor kan vi ikke bruge {{ site.url | prepend:media_url }}.
+full_media_url: http://bubula2.com
+
+# Feed limit. Multiply by 2 as the for loop will get both languages.
+feed_limit: 10
+
+include:
+  - .htaccess
+  - bilder
+exclude:
+  - build.pl
+  - README.md
+
+# Build settings
+markdown: kramdown
+
+# Language list for building menu
+languages:
+  -
+    short: da
+    full: dansk
+  -
+    short: en
+    full: English
+
+# Defaults
+defaults:
+  -
+    scope:
+      type: posts
+    values:
+      is_comic: true
+      layout: comic
+  -
+    scope:
+      type: pages
+    values:
+      layout: page
+  -
+    scope:
+      path: da
+    values:
+      lang: da
+      comics_url_path: /da/striber/
+  -
+    scope:
+      path: en
+    values:
+      lang: en
+      comics_url_path: /en/comics/
+  -
+    scope:
+      path: da
+      type: posts
+    values:
+      category: striber
+  -
+    scope:
+      path: en
+      type: posts
+    values:
+      category: comics

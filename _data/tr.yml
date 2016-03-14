@@ -1,0 +1,70 @@
+# Translations
+comics:
+  da: striber
+  en: comics
+by:
+  da: af
+  en: by
+description:
+  da: En web-tegneserie.
+  en: A webcomic.
+keywords:
+  da: tegneserie, web-tegneserie, humor, bubula, bubula2, bubula^2
+  en: comic, webcomic, humor, bubula, bubula2, bubula^2
+title_trans:
+  da: 'Latin, "Tud som en ugle, oksekød" (forudsat, at Bubula=2)'
+  en: 'Latin, "Hoot like an owl, beef" (provided that Bubula=2)'
+updating:
+  da: Opdaterer en gang imellem
+  en: Updating once in a while
+subscribe:
+  da: abonner
+  en: subscribe
+contact:
+  da: kontakt
+  en: contact
+license_title:
+  da: Creative Commons Licens
+  en: Creative Commons License
+is_licensed_under:
+  da: er licenseret under en
+  en: is licensed under a
+license_add:
+  da: Men jeg vil blive glad for at høre det, hvis du bruger min tegneserie!
+  en: But I would love to hear if you use my comic!
+license_name:
+  da: Creative Commons Navngivelse-IkkeKommerciel-IngenBearbejdelse 3.0 Unported Licens
+  en: Creative Commons Attribution-NonCommercial-NoDerivs 3.0 Unported License
+license_url:
+  da: http://creativecommons.org/licenses/by-nc-nd/3.0/deed.da
+  en: http://creativecommons.org/licenses/by-nc-nd/3.0/deed.en_US
+feed_title:
+  da: Bubula² seneste striber
+  en: Bubula² latest comics
+feed_description:
+  da: Seneste striber i web-tegneserien Bubula².
+  en: Latest comic of the Bubula² webcomic.
+permalink_text:
+  da: Sprogneutralt permalink
+  en: Language independent permalink
+comic:
+  da: stribe
+  en: comic
+select:
+  da: vælg
+  en: select
+first:
+  da: første
+  en: first
+previous:
+  da: forrige
+  en: previous
+next:
+  da: næste
+  en: next
+latest:
+  da: seneste
+  en: latest
+random:
+  da: tilfældig
+  en: random
