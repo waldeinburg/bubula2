@@ -24,6 +24,8 @@ include:
   - .htaccess
   - /bilder
 exclude:
+  - Gemfile
+  - Gemfile.lock
   - /vendor
   - /build.pl
   - /README.md
