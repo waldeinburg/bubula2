@@ -6,8 +6,12 @@ use warnings;
 use Getopt::Long;
 use File::Find;
 use File::Basename;
+use Cwd;
+use YAML::XS;
 
+use constant SITE_DIR => '_site';
 use constant YUICOMPRESSOR => '/usr/local/share/yuicompressor-2.4.8.jar';
+use constant PRIVATE => 'private.yml';
 
 my %bundle_and_minify = (
     'js/pack.js' => [
@@ -34,12 +38,14 @@ my $nobuild = 0;
 my $nominify = 0;
 my $nobundle = 0;
 my $keeporigs = 0;
+my $deploy = 0;
 
 GetOptions(
     'nobuild' => \$nobuild,
     'nominify' => \$nominify,
     'nobundle' => \$nobundle,
-    'keeporigs' => \$keeporigs
+    'keeporigs' => \$keeporigs,
+    'deploy' => \$deploy
 ) || exit;
 
 
@@ -69,14 +75,15 @@ unless ($nominify) {
         close(F);
     }
 
-    find(\&wanted, '_site');
+    find(\&wanted, SITE_DIR);
 }
 
 unless ($nobundle) {
     print "Bundling and minifying JS and CSS ...\n";
 
     local $/;
-    chdir('_site') || die("Could not switch to _site");
+    my $cwd = getcwd;
+    chdir(SITE_DIR) || die("Could not switch to " . SITE_DIR);
 
     for my $pack (keys %bundle_and_minify) {
         my($name, $dir, $suffix) = fileparse($pack, qr/\.[^.]+/);
@@ -96,4 +103,18 @@ unless ($nobundle) {
             && die("Failed execute: $!");
         unlink($pack) unless $keeporigs;
     }
+    
+    chdir($cwd) || die("Could not switch back to workdir!");
+}
+
+if ($deploy) {
+    open(F, '<', PRIVATE) || die(PRIVATE . ": $!");
+    local $/;
+    my $conf = Load(<F>);
+    close(F);
+    
+    system('rsync', '-avuz', '--delete',
+           SITE_DIR . '/',
+           $conf->{username} . '@' . $conf->{server} . ':' . $conf->{wwwdir} . '/'
+    );
 }
