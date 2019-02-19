@@ -18,7 +18,7 @@ css_prod: comic-pack.min.css
   comic.id = {{ page.slug }};
   comic.url = '{{ site.url }}{{ page.url }}';
   comic.comicsUrlPath = '{{ page.comics_url_path }}';
-  comic.title = '{{ page.title | replace:'\':'\\' | replace:"'","\'" }}';
+  comic.title = '{{ page.title | replace:"\","\\" | replace:"'","\'" }}';
   comic.latestId = {{ site.posts.first.slug }};
 </script>
 

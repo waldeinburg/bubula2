@@ -108,6 +108,7 @@ unless ($nobundle) {
 }
 
 if ($deploy) {
+    print "Deploying ...\n";
     open(F, '<', PRIVATE) || die(PRIVATE . ": $!");
     local $/;
     my $conf = Load(<F>);
