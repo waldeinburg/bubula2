@@ -2,7 +2,7 @@
 title: About
 subtitle: a webcomic that, uhm …
 permalink_foreign: /da/om/
-weight: 2
+weight: 3
 ---
 
 𝔅𝔲𝔟𝔲𝔩𝔞² is a webcomic which … well, I do not yet know how it in itself should

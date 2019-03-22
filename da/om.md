@@ -2,7 +2,7 @@
 title: Om
 subtitle: en web-tegneserie, som, øh …
 permalink_foreign: /en/about/
-weight: 2
+weight: 3
 ---
 
 𝔅𝔲𝔟𝔲𝔩𝔞² er en web-tegneserie, som … tjah, jeg ved endnu ikke, hvordan den i sig
