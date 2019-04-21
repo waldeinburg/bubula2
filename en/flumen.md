@@ -5,8 +5,6 @@ permalink_foreign: /da/flumen/
 weight: 2
 ---
 
-**… Coming soon …**
-
 I occasionally make doodles (especially during meetings at work) which I
 like to share in a gallery. this gallery is
 [𝔅𝔲𝔟𝔲𝔩𝔞² Flumen](http://flumen.bubula2.com). You can visit

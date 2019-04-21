@@ -5,8 +5,6 @@ permalink_foreign: /en/flumen/
 weight: 2
 ---
 
-**… Kommer snart …**
-
 Jeg skribler af og til små tegninger ned (særligt under møder på
 arbejde), som jeg gerne vil lægge ud i et lille galleri. Dette galleri
 er
