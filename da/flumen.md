@@ -25,10 +25,8 @@ spørger) charmerende eller irriterende ved flow-TV og videoudlejning:
   om, den er nede, hvis andre er i gang med en forespørgsel. Genindlæs,
   hvis noget er galt, måske er der bare andre foran i køen!
 - Siden er kun oppe én time om ugen! Den kører på en gammel
-  [Raspberry Pi](https://www.raspberrypi.org) under min sofa, som sidder
-  i en stikdåse med timer. Siden kan også være oppe, hvis jeg vælger at
-  tænde for maskinen. Og siden kan være nede, hvis en af mine børn har
-  leget under sofaen.
+  [Raspberry Pi](https://www.raspberrypi.org), som sidder i en stikdåse med timer.
+  Siden kan også være oppe, hvis jeg vælger at tænde for maskinen.
 
 Kildekoden til Flumen kan findes på
 [GitHub](https://github.com/waldeinburg/bubula2-flumen).
