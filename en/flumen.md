@@ -18,7 +18,7 @@ annoying about flow TV and video rental services:
 - The images are shown in randomized order, one image per page view;
   that is, only one person can watch each image. Your experience is
   unique for that week!
-- Flumen is social: If other persons on the same network visits the site
+- Flumen is social: If other persons on the same network visit the site
   you will frequently block each other. Find that other person and visit
   the site together!
 - The server is extremely primitively implemented. E.g., it will look as
@@ -27,10 +27,8 @@ annoying about flow TV and video rental services:
   in line in front of you!
 - The site is only up and running one hour each week. It's running on an
   old
-  [Raspberry Pi](https://www.raspberrypi.org) under my couch in a timer
-  socket. The site may also be running if I choose to turn on the
-  machine. And the site may be down if one of my kids has been playing
-  under the couch.
+  [Raspberry Pi](https://www.raspberrypi.org) in a timer socket.
+  The site may also be running if I choose to turn on the machine.
 
 The source code for Flumen can be found on
 [GitHub](https://github.com/waldeinburg/bubula2-flumen).
