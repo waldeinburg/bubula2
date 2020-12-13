@@ -30,6 +30,7 @@ exclude:
   - /vendor
   - /build.pl
   - /README.md
+  - /serve.sh
 
 # Build settings
 markdown: kramdown
