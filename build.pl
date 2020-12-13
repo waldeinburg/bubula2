@@ -116,6 +116,6 @@ if ($deploy) {
     
     system('rsync', '-avuz', '--delete',
            SITE_DIR . '/',
-           $conf->{username} . '@' . $conf->{server} . ':' . $conf->{wwwdir} . '/'
+           $conf->{server} . ':' . $conf->{wwwdir} . '/'
     );
 }
