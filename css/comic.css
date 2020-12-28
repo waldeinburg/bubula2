@@ -61,14 +61,6 @@ h2, #comic-dateMenu {
   margin-bottom: 1em;
 }
 
-#ohnorobot {
-  margin-top: 2em;
-  text-align: center;
-}
-#ohnorobot a:hover {
-  opacity: 0.5;
-}
-
 @media print {
   #paypal {
     display: none !important;

@@ -55,21 +55,4 @@
         var id = Math.floor(Math.random() * comic.latestId) + 1;
         window.location = comic.comicsUrlPath + id + '/';
     });
-    
-    /*
-     * Oh No Robot loader
-     * Oh No Robot has a tendency to load slow. Insert after everything else is loaded.
-     * Inline Script is not good enough because ONR-lack will affect js triggered by the ready event.
-     * Wait till everything else is loaded.
-     */
-    $(document).ready(function($) {
-        // http://api.jquery.com/jQuery.getScript/
-        // should we override the cache setting temporarily?
-        $.getScript('http://www.ohnorobot.com/js/2033.js', function() {
-            orgW = document.write;
-            document.write = function(s) { $('#ohnorobot').append(s); };
-            transcribe('apqYa6imImgok2033', comic.url, comic.title);
-            document.write = orgW;
-        });
-    });
 })(jQuery);
