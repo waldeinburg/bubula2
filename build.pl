@@ -41,11 +41,11 @@ my $keeporigs = 0;
 my $deploy = 0;
 
 GetOptions(
-    'nobuild' => \$nobuild,
-    'nominify' => \$nominify,
-    'nobundle' => \$nobundle,
+    'nobuild'   => \$nobuild,
+    'nominify'  => \$nominify,
+    'nobundle'  => \$nobundle,
     'keeporigs' => \$keeporigs,
-    'deploy' => \$deploy
+    'deploy'    => \$deploy
 ) || exit;
 
 
@@ -103,7 +103,7 @@ unless ($nobundle) {
             && die("Failed execute: $!");
         unlink($pack) unless $keeporigs;
     }
-    
+
     chdir($cwd) || die("Could not switch back to workdir!");
 }
 
@@ -113,9 +113,20 @@ if ($deploy) {
     local $/;
     my $conf = Load(<F>);
     close(F);
-    
-    system('rsync', '-avuz', '--delete',
-           SITE_DIR . '/',
-           $conf->{server} . ':' . $conf->{wwwdir} . '/'
-    );
+    my $server = $conf->{server};
+    my $wwwdir = $conf->{wwwdir};
+
+    sub exec_ssh {
+        my ($cmd) = @_;
+        system('ssh', $server, $cmd)
+            && die("Could not execute ssh command $cmd");
+    }
+
+    # Commented out. Current host does not support rsync.
+    # system('rsync', '-avuz', '--delete',
+    #     SITE_DIR . '/',
+    #     $server . ':' . $wwwdir . '/'
+    # );
+
+    system('./remote_sync.sh', SITE_DIR, $server, $wwwdir);
 }

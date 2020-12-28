@@ -31,6 +31,7 @@ exclude:
   - /build.pl
   - /README.md
   - /serve.sh
+  - remote_sync.sh
 
 # Build settings
 markdown: kramdown
